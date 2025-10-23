@@ -137,8 +137,18 @@
             box-shadow: 0 3px #006400;
             color: black;
         }
-        .loading-spinner { /* ... (Spinner styles remain the same) ... */ }
+        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #00f800;
+            border-radius: 50%;
+            width: 1.2rem;
+            height: 1.2rem;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
         
         #messageBox {
             position: fixed; 
@@ -277,7 +287,38 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
-    // --- DOM Elements & Constants ---
+    // --- PRE-WRITTEN DIALOGUE (New Feature!) ---
+    const PRE_WRITTEN_DIALOGUE = {
+        // High Score (300+ sweets) dialogue from Mandala the Angel (😇, FA Clan)
+        high: [
+            "Your score is a testament to the divine light! The FA Clan celebrates this monumental sweep of sweetness. Truly a glorious day!",
+            "Such grace and dedication! You've soared above the Nulli filth. Keep collecting, for the celestial hoard is ever expanding!",
+            "A magnificent feat! You are a beacon of hope against the Poopocalypse. The heavens smile upon your high score of collected treats.",
+            "Mandala is impressed! This score is a prayer answered, a perfect harmony of skill and luck. Go forth and shine!",
+            "Hark! The Nulli Clan trembles at this total. You have proven that virtue is stronger than vile stench. Excellent work!",
+            "Look at those numbers! An ethereal harvest! May your next run bring even greater glory to the FA Clan's cause.",
+            "You have achieved true purity of purpose. This high score ensures your name is sung throughout the halls of the heavens!",
+            "Divine! The Nulli's attempts were futile against such masterful collection. Keep your spirit bright and your bucket full!",
+            "I grant you my blessing for this outstanding result. Your diligence in gathering sweets is an inspiration to all.",
+            "The Poopocalypse is temporarily subdued! Your score shines like a thousand suns. Thank you for your service to the sweet cause."
+        ],
+        // Low Score (less than 300 sweets) dialogue from Jehannum the Devil (😈, Nulli Clan)
+        low: [
+            "Pitiful! That score is as weak as your defenses. Did you even try to collect any sweets, mortal?",
+            "Hahaha! The Nulli Clan is thriving on your incompetence. Come back when you've learned to dodge something other than your responsibilities!",
+            "A tragic and pathetic attempt. That meager score barely registers on our chaos meter. Next!",
+            "Jehannum is amused! Such a small total means more treats for our side. Enjoy the taste of failure, weakling!",
+            "Did you mistake this for a 'poop collector' game? Your score suggests confusion. You are a true embarrassment!",
+            "This isn't even worth a taunt. Your score is a joke. Go practice in the nursery, little one.",
+            "Your sweet-gathering skills are a blight on the earth. Perhaps you should stick to something simpler, like breathing.",
+            "I was hoping for a challenge, and you delivered *this*? Your score is a stain on the leaderboard.",
+            "Look at that low number! Did you rage quit or did the Nulli's gifts simply overwhelm your tiny mind?",
+            "You are a disappointment to both clans. That score is a monument to your lack of effort. Don't bother returning."
+        ]
+    };
+
+    
+    // --- DOM Elements & Constants (omitted for brevity) ---
     const launcherContainer = document.getElementById('launcherContainer');
     const gameContainer = document.getElementById('gameContainer');
     const launchButton = document.getElementById('launchButton');
@@ -359,7 +400,7 @@
     
     let lastPoopSpeedIncreaseScore = 0; 
     
-    // --- Sound Logic ---
+    // --- Sound Logic (omitted for brevity) ---
     function playTone(freq, duration = 0.1, type = 'square', volume = 0.5) {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -398,88 +439,61 @@
     function playGameOverSound() { playTone(50, 1.5, 'triangle', 0.9); }
     function playStartSound() { playTone(440, 0.05, 'sine'); playTone(660, 0.1, 'sine'); }
     function playSpecialClearSound() { playTone(1500, 0.05, 'sine', 0.3); } 
-    function playLaunchSound() { playTone(1046.5, 0.1, 'square', 0.6); } // C6 tone for launcher
-
+    function playLaunchSound() { playTone(1046.5, 0.1, 'square', 0.6); } 
     
-    // --- Gemini API Setup ---
-    const API_KEY = ""; 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+    // --- Pre-Written Dialogue Logic (UPDATED) ---
     
-    async function exponentialBackoffFetch(url, options, maxRetries = 5, delay = 1000) {
-        for (let i = 0; i < maxRetries; i++) {
-            try {
-                const response = await fetch(url, options);
-                if (response.ok) { return response; }
-                if (response.status === 429 || response.status >= 500) {
-                    throw new Error(`Server error or throttling: ${response.status}`);
-                }
-                throw new Error(`Client error: ${response.status}`);
-            } catch (error) {
-                if (i === maxRetries - 1) {
-                    console.error("Max retries reached. Failed to fetch:", error.message);
-                    throw error;
-                }
-                await new Promise(resolve => setTimeout(resolve, delay * (2 ** i)));
-            }
+    function getRandomDialogue(isHigh) {
+        if (isHigh) {
+            const index = Math.floor(Math.random() * PRE_WRITTEN_DIALOGUE.high.length);
+            return {
+                text: PRE_WRITTEN_DIALOGUE.high[index],
+                characterName: 'Mandala',
+                emoji: '😇',
+                clanName: 'FA Clan'
+            };
+        } else {
+            const index = Math.floor(Math.random() * PRE_WRITTEN_DIALOGUE.low.length);
+            return {
+                text: PRE_WRITTEN_DIALOGUE.low[index],
+                characterName: 'Jehannum',
+                emoji: '😈',
+                clanName: 'Nulli Clan'
+            };
         }
     }
-    
+
     async function generateThematicDialogue(finalScore) {
         const clanLabel = document.getElementById('clanLabel');
-        
         llmResponseContainer.classList.add('hidden');
         geminiButton.disabled = true;
-        llmResponseText.innerHTML = '<div class="loading-spinner"></div> Generating insight...';
+        llmResponseText.innerHTML = '<div class="loading-spinner"></div> Summoning final word...';
         
+        // Simulate a small delay for dramatic effect
+        await new Promise(resolve => setTimeout(resolve, 800)); 
+
         const isHighScore = finalScore >= 300; 
-        let systemPrompt, characterName, emoji, clanName;
         
-        if (isHighScore) {
-            emoji = '😇';
-            characterName = 'Mandala';
-            clanName = 'FA Clan'; 
-            systemPrompt = `You are Mandala, a benevolent angel from the FA Clan. You provide words of divine encouragement and praise. Your response must be extremely brief (one to two sentences max), enthusiastic, and relate directly to the player's high score. The score is a measure of collected sweets. Do not use markdown (like ** or *).`;
-        } else {
-            emoji = '😈';
-            characterName = 'Jehannum';
-            clanName = 'Nulli Clan'; 
-            systemPrompt = `You are Jehannum, a smug and celebratory devil from the Nulli Clan. You provide a single, short taunt or snarky comment about the player's pitiful score (which is a count of collected sweets). Be concise, cruel, and entertaining. Do not use markdown (like ** or *).`;
-        }
-
-        const userQuery = `The player achieved a final score of ${finalScore} sweets. Give a short, two-sentence comment reflecting on this performance in the game Poopocalypse: Nulli Rising.`;
-
-        const payload = {
-            contents: [{ parts: [{ text: userQuery }] }],
-            systemInstruction: {
-                parts: [{ text: systemPrompt }]
-            },
-        };
-
         try {
-            const response = await exponentialBackoffFetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const result = getRandomDialogue(isHighScore);
             
-            const result = await response.json();
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "The cosmos are silent. No message received.";
-            
+            const { text, characterName, emoji, clanName } = result;
+
             llmResponseText.innerHTML = `**${characterName} ${emoji}:** ${text.trim()}`;
             llmResponseContainer.classList.remove('hidden');
+            clanLabel.textContent = `Final Word from the ${clanName}:`;
 
         } catch (error) {
-            console.error("Gemini API Call failed:", error);
-            llmResponseText.innerHTML = `**Error:** Failed to connect to the ${clanName}. Try again!`;
+            console.error("Dialogue generation failed:", error);
+            llmResponseText.innerHTML = `**Error:** The message scrolls off the screen! Try again.`;
             llmResponseContainer.classList.remove('hidden');
 
         } finally {
-            clanLabel.textContent = `Final Word from the ${clanName}:`;
             geminiButton.disabled = false;
         }
     }
     
-    // --- Firebase & Firestore Setup ---
+    // --- Firebase & Firestore Setup (omitted for brevity) ---
 
     function getHighScoresCollectionRef() {
         return collection(db, `artifacts/${appId}/public/data/highscores`);
@@ -571,7 +585,7 @@
         });
     }
 
-    // --- Game Logic ---
+    // --- Game Logic (omitted for brevity) ---
     const CHAR_POSITIONS = {
         ANGEL: CANVAS_WIDTH / 2 - 80,
         HEROINE: CANVAS_WIDTH / 2 - 40,
