@@ -132,6 +132,8 @@
             text-shadow: 3px 3px 0 #000000;
             line-height: 1.4;
             padding: 0.5rem;
+            /* FIX APPLIED HERE: Centering the text */
+            text-align: center;
         }
 
         /* --- CONSOLIDATED TOP HUD STYLES --- */
@@ -312,8 +314,8 @@
         <span class="nulli-title">THE NULLI VILLAINS</span><br>
         These dark allies of Jehannum bring chaos to the field:
         <ul>
-            <li><b>Jehannum (😈):</b> The Source of the filth! Throws Poop and Bombs.</li>
             <li><b>Jackyna (🧙‍♀️):</b> The Witch uses dark magic to slow all Sweets for 5 seconds, making them harder to collect!</li>
+            <li><b>Jehannum (😈):</b> The Source of the filth! Throws Poop and Bombs.</li>
         </ul>
         <br><br> 
         Master the swipe! Move your collector (😋) with precision to survive the onslaught and climb the Global Leaderboard!
@@ -326,6 +328,7 @@
 
 
 <div id="gameContainer" class="game-container">
+    <!-- FIX APPLIED HERE: The .game-title class now has 'text-align: center;' in the <style> block -->
     <h1 class="game-title">😈 POOPOCALYPSE: NULLI RISING 🧙</h1>
 
     <!-- Consolidated Top HUD: Score, Lives, and Cooldowns -->
@@ -341,20 +344,24 @@
         <div id="hudPanel" class="w-full flex justify-around text-xs font-bold">
             <!-- Mandala Bar (Angel Power-up Cooldown) - FIRST (Mandala) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">😇 MANDALA</div>
-                <div id="mandalaBar" class="h-4 bg-purple-500 transition-all duration-100" style="width: 100%;"></div>
+                <!-- ADDED ID for dynamic countdown text -->
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="mandalaLabel">😇 MANDALA</div>
+                <!-- Removed inline style width=100% -->
+                <div id="mandalaBar" class="h-4 bg-purple-500 transition-all duration-100"></div>
             </div>
 
-            <!-- Zey Bar (Poop Clear Cooldown) - SECOND (Zey) - SWAPPED POSITION -->
+            <!-- Zey Bar (Poop Clear Cooldown) - SECOND (Zey) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">🧝‍♀️ ZEY</div>
-                <div id="zeyBar" class="h-4 bg-blue-500 transition-all duration-100" style="width: 100%;"></div>
+                <!-- ADDED ID for dynamic countdown text -->
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="zeyLabel">🧝‍♀️ ZEY</div>
+                <div id="zeyBar" class="h-4 bg-blue-500 transition-all duration-100"></div>
             </div>
 
-            <!-- Jackyna Bar (Sweet Clear Cooldown) - THIRD (Jackyna) - SWAPPED POSITION -->
+            <!-- Jackyna Bar (Sweet Clear Cooldown) - THIRD (Jackyna) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">🧙‍♀️ JACKYNA</div>
-                <div id="jackynaBar" class="h-4 bg-red-500 transition-all duration-100" style="width: 100%;"></div>
+                <!-- ADDED ID for dynamic countdown text -->
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="jackynaLabel">🧙‍♀️ JACKYNA</div>
+                <div id="jackynaBar" class="h-4 bg-red-500 transition-all duration-100"></div>
             </div>
         </div>
     </div>
@@ -454,6 +461,12 @@
     const mandalaBar = document.getElementById('mandalaBar');
     const jackynaBar = document.getElementById('jackynaBar');
     const zeyBar = document.getElementById('zeyBar');
+
+    // NEW HUD LABELS
+    const mandalaLabel = document.getElementById('mandalaLabel');
+    const zeyLabel = document.getElementById('zeyLabel');
+    const jackynaLabel = document.getElementById('jackynaLabel');
+
 
     // Canvas size is now dynamic - using initial size for aspect ratio only
     const INITIAL_CANVAS_HEIGHT = 400; // Used for calculating player Y position
@@ -1320,21 +1333,47 @@
         // Purple when waiting, Green when ready
         mandalaBar.style.backgroundColor = remainingMandalaTime > 0 ? '#a855f7' : '#10b981';
 
+        // Display countdown for Mandala
+        if (remainingMandalaTime > 0) {
+            const timeInSeconds = Math.ceil(remainingMandalaTime / 1000);
+            mandalaLabel.textContent = `😇 ${timeInSeconds}s`;
+        } else {
+            mandalaLabel.textContent = '😇 READY';
+        }
+
         // 2. Zey Bar (Poop Clear Cooldown)
         const totalZeyTime = ZEY_MAX_INTERVAL;
+        // nextZeyTime is calculated in resetGame/startGame
         const remainingZeyTime = Math.max(0, nextZeyTime - currentTime);
         const zeyPercent = Math.min(100, (remainingZeyTime / totalZeyTime) * 100);
 
         zeyBar.style.width = `${100 - zeyPercent}%`;
         zeyBar.style.backgroundColor = zeyPercent > 0 ? '#3b82f6' : '#10b981';
+        
+        // Display countdown for Zey
+        if (remainingZeyTime > 0) {
+            const timeInSeconds = Math.ceil(remainingZeyTime / 1000);
+            zeyLabel.textContent = `🧝‍♀️ ${timeInSeconds}s`;
+        } else {
+            zeyLabel.textContent = '🧝‍♀️ READY';
+        }
 
         // 3. Jackyna Bar (Sweet Clear Cooldown)
         const totalJackynaTime = JACKYNA_MAX_INTERVAL;
+        // nextJackynaTime is calculated in resetGame/startGame
         const remainingJackynaTime = Math.max(0, nextJackynaTime - currentTime);
         const jackynaPercent = Math.min(100, (remainingJackynaTime / totalJackynaTime) * 100);
 
         jackynaBar.style.width = `${100 - jackynaPercent}%`;
         jackynaBar.style.backgroundColor = jackynaPercent > 0 ? '#ef4444' : '#10b981';
+
+        // Display countdown for Jackyna
+        if (remainingJackynaTime > 0) {
+            const timeInSeconds = Math.ceil(remainingJackynaTime / 1000);
+            jackynaLabel.textContent = `🧙‍♀️ ${timeInSeconds}s`;
+        } else {
+            jackynaLabel.textContent = '🧙‍♀️ READY';
+        }
     }
 
     function showMessage(title, text, buttons) {
@@ -1459,12 +1498,7 @@
         playStartSound();
         gameRunning = true;
 
-        lastTime = performance.now();
-        lastAngelTime = lastTime;
-        lastJackynaTime = lastTime;
-        lastZeyTime = lastTime;
-        nextJackynaTime = calculateNextJackynaTime();
-        nextZeyTime = calculateNextZeyTime();
+        // Note: Timers are now initialized in resetGame()
 
         gameLoopId = requestAnimationFrame(gameLoop);
     }
@@ -1481,7 +1515,9 @@
         noGoZones = [];
 
         // Reset all effects and timing
-        lastAngelTime = performance.now(); // Reset Mandala timer
+        const currentTime = performance.now();
+        lastTime = currentTime; // Set lastTime for correct deltaTime on first frame
+        lastAngelTime = currentTime; // Reset Mandala timer to start cooldown immediately
         angelVisible = false;
         jackynaVisible = false;
         zeyVisible = false;
@@ -1489,6 +1525,10 @@
         playerSlowed = false;
         nulliBossActive = false;
         lastBombTime = 0;
+        
+        // Initialize next spawn times so HUD bars are correct (start at 0%)
+        nextJackynaTime = calculateNextJackynaTime();
+        nextZeyTime = calculateNextZeyTime();
 
         // Reset difficulty
         sweetDropSpeed = 1.4;
@@ -1595,7 +1635,7 @@ Enter your name to record your high score on the permanent, competitive leaderbo
             loadHighScores();
         }
 
-        resetGame();
+        resetGame(); // This call now correctly initializes the HUD bars and countdowns
     }
 
     window.onload = init;
