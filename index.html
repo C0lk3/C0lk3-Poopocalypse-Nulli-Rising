@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>😈 Poopocalypse: Nulli Rising 🧙</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
-    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.52/Tone.js"></script>
-    
     <style>
         /* --- General Variables & Body --- */
         :root {
@@ -21,10 +17,12 @@
             --text-color: #ffffff;
         }
 
+        /* --- FONT CHANGE APPLIED HERE --- */
         body {
             background-color: var(--dark-bg);
             color: var(--text-color);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Press Start 2P', cursive; /* CHANGED to Press Start 2P */
+            font-size: 12px; /* Base size adjustment for pixel font legibility */
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -43,21 +41,46 @@
             padding: 2rem;
             max-width: 500px;
             width: 100%;
-            text-align: center;
+            text-align: left; 
         }
         .main-title {
             font-family: 'Press Start 2P', cursive;
             font-size: 1.5rem;
-            color: var(--gold-title);
+            color: var(--neon-green);
             text-shadow: 2px 2px 0 #000000;
             margin-bottom: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: fit-content;
         }
         .description {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            line-height: 1.8;
             margin-bottom: 2.5rem;
             color: #c0c0c0;
-            line-height: 1.6;
+            text-align: left;
         }
+
+        /* --- New Title Styles for Introduction --- */
+        .fa-title {
+            color: #ffcc00; /* Yellow/Gold */
+            font-weight: 700;
+            font-size: 0.85rem; 
+            display: block; 
+            margin: 0.75rem 0 0.5rem 0;
+            text-shadow: 1px 1px 0 #000;
+            text-align: left; 
+        }
+        .nulli-title {
+            color: #ef4444; /* Red */
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: block;
+            margin: 0.75rem 0 0.5rem 0;
+            text-shadow: 1px 1px 0 #000;
+            text-align: left; 
+        }
+
         .launch-button {
             padding: 1rem 2.5rem;
             font-size: 1.1rem;
@@ -71,6 +94,10 @@
             box-shadow: 0 4px #006400;
             user-select: none;
             text-transform: uppercase;
+            font-family: 'Press Start 2P', cursive; 
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
         }
         .launch-button:hover {
             background: linear-gradient(145deg, #39ff14, #24d673);
@@ -89,45 +116,69 @@
             border: 6px solid #00f800;
             box-shadow: 0 8px 20px rgba(0, 255, 0, 0.4);
             border-radius: 18px;
-            padding: 0.5rem; 
-            max-width: 320px; 
+            padding: 0;
+            /* Allow game container to grow responsively */
+            max-width: 500px; 
             width: 100%;
             flex-direction: column;
             align-items: center;
-            font-family: 'Pixelify Sans', sans-serif;
+            font-family: 'Press Start 2P', cursive; 
+            overflow: hidden;
         }
-        canvas {
-            display: block;
-            background-color: #4a148c; /* Deep Violet Canvas */
-            border: 3px solid #ffeb3b; /* Yellow/Gold Inner Border */
-            border-radius: 10px;
-            margin-top: 0.5rem;
-            touch-action: none; /* Prevents touch scrolling/panning interference */
+        .game-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: #00f800;
+            text-shadow: 3px 3px 0 #000000;
+            line-height: 1.4;
+            padding: 0.5rem;
         }
+
+        /* --- CONSOLIDATED TOP HUD STYLES --- */
+        #consolidatedHud {
+            background-color: #111827; /* Dark background for HUD */
+            padding: 0.4rem 0.6rem;
+            border-bottom: 2px solid #ffcc00; /* Gold divider */
+        }
+
         .info-bar {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            padding: 0.4rem 0.2rem; 
-            font-size: 1rem; 
+            padding: 0.1rem 0;
+            font-size: 0.7rem; 
             font-weight: 700;
             color: #ffffff;
+            font-family: 'Press Start 2P', cursive;
         }
-        .game-title {
-            font-family: 'Press Start 2P', cursive; 
-            font-size: 1.2rem; 
-            color: #00f800; 
-            text-shadow: 3px 3px 0 #000000; 
-            line-height: 1.4;
+
+        #hudPanel {
+            padding: 0.4rem 0;
+            gap: 0.5rem;
         }
+        /* End HUD Styles */
+
+        canvas {
+            display: block;
+            background-color: #4a148c; /* Deep Violet Canvas */
+            border: 3px solid #ffeb3b; /* Yellow/Gold Inner Border */
+            border-radius: 6px;
+            margin: 0.5rem auto; /* Center with margin */
+            touch-action: none;
+            /* CRITICAL: Ensure canvas scales responsively */
+            width: calc(100% - 1rem); /* 100% minus some margin for inner border */
+            height: auto; /* Maintain aspect ratio */
+            aspect-ratio: 1 / 1; /* Force square aspect ratio */
+        }
+
         .button {
-            padding: 0.5rem 1rem; 
-            font-size: 0.9rem; 
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            color: black; 
-            background: linear-gradient(145deg, #fceb9c, #ffcc00); 
+            color: black;
+            background: linear-gradient(145deg, #fceb9c, #ffcc00);
             border: none;
-            border-radius: 8px; 
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.1s ease;
             box-shadow: 0 3px #cc9900;
@@ -135,13 +186,19 @@
         }
         /* Styles for Game Over/Message Box */
         .button-llm {
-            background: linear-gradient(145deg, #00f800, #18a558); 
+            background: linear-gradient(145deg, #00f800, #18a558);
             box-shadow: 0 3px #006400;
             color: black;
         }
-        
+        .button-submit {
+            background: linear-gradient(145deg, #fceb9c, #ffcc00);
+            box-shadow: 0 3px #cc9900;
+            color: black;
+        }
+
+
         #messageBox {
-            position: fixed; 
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -156,60 +213,61 @@
             align-items: center;
             text-align: center;
             z-index: 100;
-            font-family: 'Pixelify Sans', sans-serif; 
+            font-family: 'Press Start 2P', cursive; 
             display: none;
         }
         #messageBox > div {
             max-width: 90%;
             padding: 15px;
-            background-color: #1a1a2e; 
+            background-color: #1a1a2e;
             border: 2px solid #00f800;
             border-radius: 12px;
-            width: 90%; /* Ensure it's responsive */
+            width: 90%;
             max-width: 380px;
         }
         #messageBox h2 {
-            font-family: 'Press Start 2P', cursive; 
-            font-size: 1.4rem; 
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem; 
             margin-bottom: 0.5rem;
-            color: #ffcc00; 
+            color: #ffcc00;
         }
         .leaderboard-card {
-            background-color: #1a1a2e; 
-            border: 2px solid #00f800; 
+            background-color: #1a1a2e;
+            border: 2px solid #00f800;
             border-radius: 10px;
-            padding: 0.4rem; 
-            margin-top: 0.75rem;
-            width: 100%;
+            padding: 0.4rem;
+            margin: 0.5rem auto; 
+            width: calc(100% - 1rem);
         }
         #highScoresTable {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem; 
+            font-size: 0.8rem;
         }
         #highScoresTable th {
-            background-color: #4a148c; 
-            color: #ffcc00; 
-            padding: 0.3rem; 
+            background-color: #4a148c;
+            color: #ffcc00;
+            padding: 0.3rem;
             text-align: left;
-            font-family: 'Press Start 2P', cursive; 
+            font-family: 'Press Start 2P', cursive;
         }
         #highScoresTable td {
             border-bottom: 1px solid #4a148c;
-            color: #c0c0c0; 
+            color: #c0c0c0;
             padding: 0.3rem;
+            font-size: 0.7rem; 
         }
-        
+
         /* This style specifically targets the intro message instruction text to use a readable font */
         .intro-instruction {
-            font-family: 'Inter', sans-serif !important; 
+            font-family: 'Press Start 2P', cursive !important; 
             font-weight: 700;
-            color: #00f800; 
-            font-size: 1.1rem;
-            display: block; /* To ensure it takes up its own line for emphasis */
+            color: #00f800;
+            font-size: 0.9rem; 
+            display: block;
             margin-top: 0.75rem;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 640px) {
             .main-title {
@@ -228,7 +286,37 @@
     <div class="main-title">😈 POOPOCALYPSE: NULLI RISING 🧙</div>
 
     <p class="description">
-        The dreaded Nulli Clan is on the rise! Play as the heroic collector 😋 in this arcade survival game. Dodge Jehannum's repulsive 💩 and collect vital treats (🍬, 🍭) to survive the Poopocalypse. The leaderboard is shared with all players, so strive for the highest score!
+        Hark! The Poopocalypse is Upon Us!<br>
+        The land is under siege by the dreadful Nulli Clan. Their merciless leader, <b>Jehannum (😈)</b>, throws vile <b>Poop (💩)</b> and ground-shattering <b>Mini-Bombs (💥)</b>, which create temporary <b>No-Go Zones</b> upon impact, and transforms into the terrifying <b>Nulli Boss (👹)</b> every 500 points!
+        <br><br>
+        Your Mission: Survival and Sweets!
+        <ul>
+            <li><b>Collect:</b> Gather vital Sweets (🍬,🍭,🍩) to earn points and sustain your existence.</li>
+            <li><b>Avoid:</b> Steer clear of the vile Poop (💩) and Mini-Bombs (💥) or their resulting <b>No-Go Zones</b>. Getting hit means losing a life and being slowed!</li>
+        </ul>
+        <br>
+        <span class="fa-title">THE FA HEROES</span><br>
+        These celestial allies fight the filth and provide aid:
+        <ul>
+            <li>
+                <b>Mandala (😇):</b> The Angel drops critical Power-Ups to aid your collection.
+                <ul class="list-disc list-inside ml-4 mt-1">
+                    <li><b>🛡️ Shield:</b> Grants temporary immunity to the next harmful collision.</li>
+                    <li><b>🧲 Magnet:</b> Pulls all nearby Sweets towards your collector for easy grabbing.</li>
+                    <li><b>💖 Heart:</b> Restores one life (up to a maximum of five).</li>
+                </ul>
+            </li>
+            <li><b>Zey (🧝‍♀️):</b> The Heroine uses her magic to slow all Poop and Mini-Bombs for 5 seconds!</li>
+        </ul>
+        <br>
+        <span class="nulli-title">THE NULLI VILLAINS</span><br>
+        These dark allies of Jehannum bring chaos to the field:
+        <ul>
+            <li><b>Jehannum (😈):</b> The Source of the filth! Throws Poop and Bombs.</li>
+            <li><b>Jackyna (🧙‍♀️):</b> The Witch uses dark magic to slow all Sweets for 5 seconds, making them harder to collect!</li>
+        </ul>
+        <br><br> 
+        Master the swipe! Move your collector (😋) with precision to survive the onslaught and climb the Global Leaderboard!
     </p>
 
     <button id="launchButton" class="launch-button">
@@ -239,59 +327,75 @@
 
 <div id="gameContainer" class="game-container">
     <h1 class="game-title">😈 POOPOCALYPSE: NULLI RISING 🧙</h1>
-    
-    <div class="info-bar">
-        <span>Score: <span id="scoreDisplay">0</span></span>
-        <span>Lives: <span id="livesDisplay">❤️ ❤️ ❤️</span></span>
+
+    <!-- Consolidated Top HUD: Score, Lives, and Cooldowns -->
+    <div id="consolidatedHud" class="w-full flex flex-col">
+        <!-- Score and Lives -->
+        <div class="info-bar">
+            <span>Score: <span id="scoreDisplay">0</span></span>
+            <!-- Lives display uses flex to manage heart spacing -->
+            <span>Lives: <span id="livesDisplay" class="flex items-center gap-0.5"></span></span>
+        </div>
+
+        <!-- Cooldowns (Mandala/Jackyna/Zey Bars) -->
+        <div id="hudPanel" class="w-full flex justify-around text-xs font-bold">
+            <!-- Mandala Bar (Angel Power-up Cooldown) - FIRST (Mandala) -->
+            <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">😇 MANDALA</div>
+                <div id="mandalaBar" class="h-4 bg-purple-500 transition-all duration-100" style="width: 100%;"></div>
+            </div>
+
+            <!-- Zey Bar (Poop Clear Cooldown) - SECOND (Zey) - SWAPPED POSITION -->
+            <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">🧝‍♀️ ZEY</div>
+                <div id="zeyBar" class="h-4 bg-blue-500 transition-all duration-100" style="width: 100%;"></div>
+            </div>
+
+            <!-- Jackyna Bar (Sweet Clear Cooldown) - THIRD (Jackyna) - SWAPPED POSITION -->
+            <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
+                <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]">🧙‍♀️ JACKYNA</div>
+                <div id="jackynaBar" class="h-4 bg-red-500 transition-all duration-100" style="width: 100%;"></div>
+            </div>
+        </div>
     </div>
 
-    <canvas id="gameCanvas" width="280" height="280"></canvas>
+    <!-- Canvas is set to default 400x400, but CSS makes it responsive -->
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
     
-    <!-- NEW HUD Panel for Cooldowns -->
-    <div id="hudPanel" class="w-full p-2 mt-2 flex justify-around gap-2 text-xs font-bold">
-        <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-            <div class="absolute inset-0 text-center text-white z-10">🧙‍♀️ WITCH</div>
-            <div id="witchBar" class="h-4 bg-red-500 transition-all duration-100" style="width: 100%;"></div>
-        </div>
-        <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-            <div class="absolute inset-0 text-center text-white z-10">🧝‍♀️ HEROINE</div>
-            <div id="heroineBar" class="h-4 bg-blue-500 transition-all duration-100" style="width: 100%;"></div>
-        </div>
-    </div>
-    
-    <div class="leaderboard-card">
-        <h2 class="text-base font-bold text-center text-yellow-500 mb-1 font-['Press Start 2P']">🏆 Top Sweet Collectors 🏆</h2>
-        <table id="highScoresTable">
-            <thead>
-                <tr>
-                    <th class="rounded-tl-lg">Rank</th>
-                    <th>Name</th>
-                    <th class="rounded-tr-lg text-right">Score</th>
-                </tr>
-            </thead>
-            <tbody id="highScoresBody">
-                <tr><td colspan="3" class="text-center py-2 text-gray-500">Initializing database...</td></tr>
-            </tbody>
-        </table>
-    </div>
 </div>
 
 
 <div id="messageBox">
     <div>
         <h2 id="messageTitle"></h2>
-        
+
         <div id="llmResponseContainer" class="mt-3 hidden">
-            <div id="clanLabel" class="text-sm font-bold text-yellow-500 mb-1">Final Word from the Clan:</div> 
+            <div id="clanLabel" class="text-sm font-bold text-yellow-500 mb-1">Final Word from the Clan:</div>
             <p id="llmResponseText" class="text-xs text-left p-2 rounded bg-purple-900/50 border border-yellow-700"></p>
         </div>
-        
+
         <p id="messageText" class="mt-3 mb-0"></p>
         
-        <div id="buttonArea" class="flex flex-col md:flex-row justify-center items-center gap-2 mt-4">
-            
+        <!-- NEW LEADERBOARD LOCATION - Hidden by default -->
+        <div id="leaderboardDisplay" class="leaderboard-card mt-4 hidden">
+            <h2 class="text-base font-bold text-center text-yellow-500 mb-1 font-['Press Start+2P']">🏆 Top Sweet Collectors 🏆</h2>
+            <table id="highScoresTable">
+                <thead>
+                    <tr>
+                        <th class="rounded-tl-lg">Rank</th>
+                        <th>Name</th>
+                        <th class="rounded-tr-lg text-right">Score</th>
+                    </tr>
+                </thead>
+                <tbody id="highScoresBody">
+                    <tr><td colspan="3" class="text-center py-2 text-gray-500">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END NEW LEADERBOARD LOCATION -->
 
-</div>
+        <div id="buttonArea" class="flex flex-col md:flex-row justify-center items-center gap-2 mt-4">
+        </div>
     </div>
 </div>
 
@@ -300,11 +404,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    
+
     // Set Firestore log level to debug for troubleshooting
     setLogLevel('Debug');
-    
-    // --- PRE-WRITTEN DIALOGUE (omitted for brevity) ---
+
+    // --- PRE-WRITTEN DIALOGUE ---
     const PRE_WRITTEN_DIALOGUE = {
         high: [
             "Your score is a testament to the divine light! The FA Clan celebrates this monumental sweep of sweetness. Truly a glorious day!",
@@ -326,12 +430,13 @@
             "Did you mistake this for a 'poop collector' game? Your score suggests confusion. You are a true embarrassment!",
             "This isn't even worth a taunt. Your score is a joke. Go practice in the nursery, little one.",
             "Your sweet-gathering skills are a blight on the earth. Perhaps you should stick to something simpler, like breathing.",
-            "I was hoping for a challenge, and you delivered *this*? Your score is a stain on the leaderboard.",
+            // MODIFIED LINE: removed asterisks from 'this'
+            "I was hoping for a challenge, and you delivered this? Your score is a stain on the leaderboard.",
             "Look at that low number! Did you rage quit or did the Nulli's gifts simply overwhelm your tiny mind?",
             "You are a disappointment to both clans. That score is a monument to your lack of effort. Don't bother returning."
         ]
     };
-    
+
     // --- DOM Elements & Constants ---
     const launcherContainer = document.getElementById('launcherContainer');
     const gameContainer = document.getElementById('gameContainer');
@@ -342,131 +447,135 @@
     const livesDisplay = document.getElementById('livesDisplay');
     const messageBox = document.getElementById('messageBox');
     const highScoresBody = document.getElementById('highScoresBody');
-    const buttonArea = document.getElementById('buttonArea'); 
-    
-    // NEW HUD ELEMENTS
-    const witchBar = document.getElementById('witchBar');
-    const heroineBar = document.getElementById('heroineBar');
+    const buttonArea = document.getElementById('buttonArea');
+    const leaderboardDisplay = document.getElementById('leaderboardDisplay');
 
-    const CANVAS_WIDTH = 280;
-    const CANVAS_HEIGHT = 280;
-    const MAX_LIVES = 5; 
-    
+    // HUD ELEMENTS
+    const mandalaBar = document.getElementById('mandalaBar');
+    const jackynaBar = document.getElementById('jackynaBar');
+    const zeyBar = document.getElementById('zeyBar');
+
+    // Canvas size is now dynamic - using initial size for aspect ratio only
+    const INITIAL_CANVAS_HEIGHT = 400; // Used for calculating player Y position
+    const MAX_LIVES = 5;
+
+    // Custom Constant for New Feature
+    const OBJECT_SLOW_DURATION = 5000; // 5 seconds
+    const SLOW_FACTOR = 0.25; // Objects move at 25% of their base speed
+
     // Character cooldowns
     const ANGEL_INTERVAL = 40000;
     const ANGEL_SHOW_DURATION = 1000;
-    const WITCH_MIN_INTERVAL = 20000;
-    const WITCH_MAX_INTERVAL = 40000;
-    const WITCH_SHOW_DURATION = 700;
-    const HEROINE_MIN_INTERVAL = 15000;
-    const HEROINE_MAX_INTERVAL = 30000;
-    const HEROINE_SHOW_DURATION = 500;
+    const JACKYNA_MIN_INTERVAL = 20000;
+    const JACKYNA_MAX_INTERVAL = 40000;
+    const JACKYNA_SHOW_DURATION = 700;
+    const ZEY_MIN_INTERVAL = 15000;
+    const ZEY_MAX_INTERVAL = 30000;
+    const ZEY_SHOW_DURATION = 500;
 
     // Game State
     let gameLoopId;
     let score = 0;
     let lives = 3;
     let gameRunning = false;
-    let playerMoveToX = CANVAS_WIDTH / 2;
-    let isPointerDown = false; 
+    let playerMoveToX = canvas.width / 2; // Initialize to current center
+    let isPointerDown = false;
     let lastTime = 0;
-    
+
     let angelVisible = false;
     let angelHiddenTime = 0;
-    let lastAngelTime = 0; // For tracking cooldown
+    let lastAngelTime = 0;
 
-    let witchVisible = false;
-    let witchHiddenTime = 0;
-    let lastWitchTime = 0; // For tracking cooldown
-    let nextWitchTime = 0;
-    
-    let heroineVisible = false;
-    let heroineHiddenTime = 0;
-    let lastHeroineTime = 0; // For tracking cooldown
-    let nextHeroineTime = 0;
-    
+    let jackynaVisible = false;
+    let jackynaHiddenTime = 0;
+    let lastJackynaTime = 0;
+    let nextJackynaTime = 0;
+
+    let zeyVisible = false;
+    let zeyHiddenTime = 0;
+    let lastZeyTime = 0;
+    let nextZeyTime = 0;
+
     let db, auth, userId;
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
     // Player and Objects
-    const player = { 
-        x: CANVAS_WIDTH / 2, 
-        y: CANVAS_HEIGHT - 30, 
-        size: 30, 
-        emoji: '😋', 
+    const player = {
+        x: canvas.width / 2,
+        y: INITIAL_CANVAS_HEIGHT - 30, // Y position is fixed relative to bottom
+        size: 30,
+        emoji: '😋',
         baseSpeed: 9,
         speed: 9,
-        invulnerable: false // For collision buffer after hit/in zone
+        invulnerable: false 
     };
-    
+
     let sweets = [];
     let poops = [];
-    let powerUps = []; // Renamed from hearts
+    let powerUps = [];
     let miniBombs = [];
-    let noGoZones = []; // { x, y, radius, endTime }
-    const BOMB_EXPLOSION_DURATION = 2500; // 2.5 seconds
+    let noGoZones = []; 
+    const BOMB_EXPLOSION_DURATION = 2500; 
     const MINI_BOMB_SCORE_START = 200;
     let lastBombTime = 0;
     const BOMB_SPAWN_INTERVAL = 3500;
-    
+
     // Status Effects State
-    let powerUpActive = null; // 'shield', 'magnet', 'speed'
-    const POWER_UP_DURATION = 8000; // 8 seconds
+    let powerUpActive = null; 
+    const POWER_UP_DURATION = 8000; 
     let powerUpEndTime = 0;
-    
-    let playerSlowed = false; // Player status
-    const PLAYER_SLOW_DURATION = 3000; 
+
+    let playerSlowed = false; 
+    const PLAYER_SLOW_DURATION = 3000;
     let slowEndTime = 0;
-    
-    let heroineSlowActive = false; // Heroine ability status
-    const HEROINE_SLOW_DURATION = 3000; 
-    let heroineSlowEndTime = 0;
-    
+
     // Boss State
     let nulliBossActive = false;
     const BOSS_INTERVAL_SCORE = 500;
-    const BOSS_DURATION = 10000; // 10 seconds
+    const BOSS_DURATION = 10000; 
     let bossEndTime = 0;
 
 
     // Object properties
-    let sweetDropSpeed = 1.4; 
-    let poopDropSpeed = 2.4;  
-    let powerUpDropSpeed = 0.9; 
-    let sweetSpawnRate = 1600; 
+    let sweetDropSpeed = 1.4;
+    let poopDropSpeed = 2.4;
+    let powerUpDropSpeed = 0.9;
+    let sweetSpawnRate = 1600;
     let poopSpawnRate = 1100;
     let lastSweetTime = 0;
     let lastPoopTime = 0;
-    let lastPoopSpeedIncreaseScore = 0; 
-    
+    let lastPoopSpeedIncreaseScore = 0;
+
     // Emojis & Positions
     const sweetEmojis = ['🍬', '🍭', '🍩', '🍫', '🍦'];
     const poopEmoji = '💩';
     const devilEmoji = '😈';
-    const angelEmoji = '😇'; 
-    const witchEmoji = '🧙‍♀️'; 
-    const heroineEmoji = '🧝‍♀️'; 
+    const angelEmoji = '😇';
+    const jackynaEmoji = '🧙‍♀️';
+    const zeyEmoji = '🧝‍♀️';
     const nulliBossEmoji = '👹';
-    
+
     const POWER_UP_DROPS = {
         HEART: { emoji: '💖', type: 'heart' },
         SHIELD: { emoji: '🛡️', type: 'shield' },
-        MAGNET: { emoji: '🧲', type: 'magnet' },
-        SPEED: { emoji: '⚡', type: 'speed' }
+        MAGNET: { emoji: '🧲', type: 'magnet' }
     };
-    const angelDrops = [POWER_UP_DROPS.HEART, POWER_UP_DROPS.SHIELD, POWER_UP_DROPS.MAGNET, POWER_UP_DROPS.SPEED];
-
-    const CHAR_POSITIONS = {
-        ANGEL: CANVAS_WIDTH / 2 - 80,
-        HEROINE: CANVAS_WIDTH / 2 - 40,
-        DEVIL: CANVAS_WIDTH / 2,
-        WITCH: CANVAS_WIDTH / 2 + 40
-    };
+    const angelDrops = [POWER_UP_DROPS.HEART, POWER_UP_DROPS.SHIELD, POWER_UP_DROPS.MAGNET];
+    
+    // Function to dynamically calculate character positions based on current canvas width
+    function getCharPositions(width) {
+        return {
+            DEVIL: width / 2,
+            ZEY: width / 2 - 60,
+            JACKYNA: width / 2 + 60,
+            ANGEL: width / 2 - 120
+        };
+    }
 
     let audioContext = null;
     let currentSoundNode = null;
 
-    // --- Sound Logic (omitted helper functions, using direct calls) ---
+    // --- Sound Logic (using Web Audio API directly) ---
     function playTone(freq, duration = 0.1, type = 'square', volume = 0.5) {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -489,7 +598,7 @@
 
         oscillator.start();
         oscillator.stop(audioContext.currentTime + duration);
-        currentSoundNode = oscillator; 
+        currentSoundNode = oscillator;
     }
 
     function stopAllSounds() {
@@ -500,13 +609,13 @@
     }
 
     function playCollectSweetSound() { playTone(880, 0.05, 'sine', 0.4); }
-    function playCollectPowerUpSound() { playTone(1200, 0.1, 'sine', 0.6); } // Used for all drops
+    function playCollectPowerUpSound() { playTone(1200, 0.1, 'sine', 0.6); }
     function playHitSound() { playTone(110, 0.4, 'square', 0.8); }
     function playGameOverSound() { playTone(50, 1.5, 'triangle', 0.9); }
     function playStartSound() { playTone(440, 0.05, 'sine'); playTone(660, 0.1, 'sine'); }
-    function playSpecialClearSound() { playTone(1500, 0.05, 'sine', 0.3); } 
-    function playLaunchSound() { playTone(1046.5, 0.1, 'square', 0.6); } 
-    
+    function playSpecialClearSound() { playTone(1500, 0.05, 'sine', 0.3); }
+    function playLaunchSound() { playTone(1046.5, 0.1, 'square', 0.6); }
+
     // --- Dialogue Generation ---
     function getRandomDialogue(isHigh) {
         if (isHigh) {
@@ -530,19 +639,19 @@
 
     function showFinalWord(finalScore) {
         const clanLabel = document.getElementById('clanLabel');
-        const llmResponseContainer = document.getElementById('llmResponseContainer'); 
+        const llmResponseContainer = document.getElementById('llmResponseContainer');
         const llmResponseText = document.getElementById('llmResponseText');
-        const finalWordButton = document.getElementById('finalWordButton'); 
-        
+        const finalWordButton = document.getElementById('finalWordButton');
+
         const isVisible = !llmResponseContainer.classList.contains('hidden');
-        
+
         if (isVisible) {
             llmResponseContainer.classList.add('hidden');
             llmResponseText.innerHTML = '';
-            finalWordButton.textContent = '✨ View Final Word';
+            if (finalWordButton) finalWordButton.textContent = '✨ View Final Word';
         } else {
-            const isHighScore = finalScore >= 300; 
-            
+            const isHighScore = finalScore >= 300;
+
             try {
                 const result = getRandomDialogue(isHighScore);
                 const { text, characterName, emoji, clanName } = result;
@@ -550,7 +659,7 @@
                 llmResponseText.innerHTML = `<strong>${characterName} ${emoji}:</strong> ${text.trim()}`;
                 llmResponseContainer.classList.remove('hidden');
                 clanLabel.textContent = `Final Word from the ${clanName}:`;
-                finalWordButton.textContent = 'Hide Final Word'; 
+                if (finalWordButton) finalWordButton.textContent = 'Hide Final Word';
 
             } catch (error) {
                 console.error("Dialogue generation failed:", error);
@@ -559,8 +668,23 @@
             }
         }
     }
-    
-    // --- Firebase & Firestore Setup (unchanged from previous version) ---
+
+    /**
+     * Toggles the visibility of the high score leaderboard in the message box.
+     * @param {HTMLElement} buttonElement The button that triggered the toggle.
+     */
+    function toggleLeaderboard(buttonElement) {
+        if (leaderboardDisplay.classList.contains('hidden')) {
+            leaderboardDisplay.classList.remove('hidden');
+            buttonElement.textContent = 'Hide Top Sweet Collectors 🏆';
+        } else {
+            leaderboardDisplay.classList.add('hidden');
+            buttonElement.textContent = 'View Top Sweet Collectors 🏆';
+        }
+    }
+
+
+    // --- Firebase & Firestore Setup ---
 
     function getHighScoresCollectionRef() {
         return collection(db, `artifacts/${appId}/public/data/highscores`);
@@ -571,17 +695,17 @@
             const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
-            
+
             auth = getAuth(app);
-            
+
             await setPersistence(auth, browserSessionPersistence);
-            
+
             if (typeof __initial_auth_token !== 'undefined') {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
                 await signInAnonymously(auth);
             }
-            
+
             userId = auth.currentUser?.uid || 'guest-' + crypto.randomUUID();
         } catch (error) {
             console.error("Error setting up Firebase:", error);
@@ -596,30 +720,31 @@
 
         try {
             await addDoc(getHighScoresCollectionRef(), {
-                name: name.substring(0, 20) || "Anonymous", 
+                name: name.substring(0, 20) || "Anonymous",
                 score: score,
                 timestamp: serverTimestamp(),
                 uid: userId
             });
         } catch (e) {
             console.error("Error adding document: ", e);
-            throw e; 
+            throw e;
         }
     }
 
     function loadHighScores() {
         if (!db) return;
 
-        const q = query(getHighScoresCollectionRef(), where("score", ">", 0)); 
-        
+        // Note: No orderBy used to avoid index requirements, sorting done client-side.
+        const q = query(getHighScoresCollectionRef(), where("score", ">", 0));
+
         onSnapshot(q, (querySnapshot) => {
             const scores = [];
             querySnapshot.forEach((doc) => {
                 scores.push(doc.data());
             });
-            
+
             scores.sort((a, b) => b.score - a.score);
-            
+
             renderHighScores(scores.slice(0, 10));
         }, (error) => {
             console.error("Error listening to high scores:", error);
@@ -629,24 +754,24 @@
 
     function renderHighScores(scores) {
         highScoresBody.innerHTML = '';
-        
+
         if (scores.length === 0) {
             highScoresBody.innerHTML = '<tr><td colspan="3" class="text-center py-2 text-gray-500">No high scores yet!</td></tr>';
             return;
         }
-        
+
         scores.forEach((data, index) => {
             const row = highScoresBody.insertRow();
             row.className = index < 3 ? 'bg-yellow-800/50 font-bold' : 'hover:bg-purple-900/50';
-            
+
             const rankCell = row.insertCell();
             rankCell.textContent = index + 1;
             rankCell.className = 'py-1 px-3 text-center';
-            
+
             const nameCell = row.insertCell();
             nameCell.textContent = data.name;
             nameCell.className = 'py-1 px-3 text-left';
-            
+
             const scoreCell = row.insertCell();
             scoreCell.textContent = data.score;
             scoreCell.className = 'py-1 px-3 text-right';
@@ -654,127 +779,153 @@
     }
 
     // --- Game Logic ---
-    
+
+    /**
+     * Resizes the canvas based on its current CSS size in the DOM, 
+     * and adjusts the player's Y position accordingly.
+     */
+    function resizeGame() {
+        const rect = canvas.getBoundingClientRect();
+        // Set the internal canvas dimensions to match the displayed size
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        // Adjust player's fixed Y position relative to the new canvas height
+        player.y = canvas.height - 30;
+        // Keep player's X position clamped to the new width
+        player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
+        playerMoveToX = player.x;
+
+        draw();
+    }
+
+
     function drawEmoji(emoji, x, y, size) {
         ctx.font = `${size}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(emoji, x, y);
     }
-    
-    function drawBossAndDevil() { 
+
+    function drawBossAndDevil() {
+        const positions = getCharPositions(canvas.width);
         if (nulliBossActive) {
             ctx.shadowColor = '#ff4500';
             ctx.shadowBlur = 15;
-            drawEmoji(nulliBossEmoji, CHAR_POSITIONS.DEVIL, 20, 40); // Nulli Boss (👹)
+            drawEmoji(nulliBossEmoji, positions.DEVIL, 20, 40);
             ctx.shadowBlur = 0;
         } else {
-            drawEmoji(devilEmoji, CHAR_POSITIONS.DEVIL, 20, 30); // Devil (😈)
+            drawEmoji(devilEmoji, positions.DEVIL, 20, 30);
         }
     }
-    
-    function drawAngel() { if (angelVisible) { drawEmoji(angelEmoji, CHAR_POSITIONS.ANGEL, 20, 30); } }
-    function drawWitch() { if (witchVisible) { drawEmoji(witchEmoji, CHAR_POSITIONS.WITCH, 20, 30); } }
-    function drawHeroine() { if (heroineVisible) { drawEmoji(heroineEmoji, CHAR_POSITIONS.HEROINE, 20, 30); } }
 
-    function calculateNextWitchTime() {
-        const randomInterval = WITCH_MIN_INTERVAL + Math.random() * (WITCH_MAX_INTERVAL - WITCH_MIN_INTERVAL);
+    function drawAngel() { 
+        const positions = getCharPositions(canvas.width);
+        if (angelVisible) { drawEmoji(angelEmoji, positions.ANGEL, 20, 30); } 
+    }
+    function drawJackyna() { 
+        const positions = getCharPositions(canvas.width);
+        if (jackynaVisible) { drawEmoji(jackynaEmoji, positions.JACKYNA, 20, 30); } 
+    }
+    function drawZey() { 
+        const positions = getCharPositions(canvas.width);
+        if (zeyVisible) { drawEmoji(zeyEmoji, positions.ZEY, 20, 30); } 
+    }
+
+    function calculateNextJackynaTime() {
+        const randomInterval = JACKYNA_MIN_INTERVAL + Math.random() * (JACKYNA_MAX_INTERVAL - JACKYNA_MIN_INTERVAL);
         return performance.now() + randomInterval;
     }
-    
-    function calculateNextHeroineTime() {
-        const randomInterval = HEROINE_MIN_INTERVAL + Math.random() * (HEROINE_MAX_INTERVAL - HEROINE_MIN_INTERVAL);
+
+    function calculateNextZeyTime() {
+        const randomInterval = ZEY_MIN_INTERVAL + Math.random() * (ZEY_MAX_INTERVAL - ZEY_MIN_INTERVAL);
         return performance.now() + randomInterval;
     }
-    
-    function triggerWitchEffect(currentTime) {
+
+    function triggerJackynaEffect(currentTime) {
         if (!gameRunning) return;
-        sweets = []; 
+        // Apply slow effect for 5 seconds (OBJECT_SLOW_DURATION)
+        sweets.forEach(sweet => {
+            sweet.slowedUntil = currentTime + OBJECT_SLOW_DURATION;
+        });
         playSpecialClearSound();
-        witchVisible = true;
-        witchHiddenTime = currentTime + WITCH_SHOW_DURATION; 
-        lastWitchTime = currentTime;
-        nextWitchTime = calculateNextWitchTime();
+        jackynaVisible = true;
+        jackynaHiddenTime = currentTime + JACKYNA_SHOW_DURATION;
+        lastJackynaTime = currentTime;
+        nextJackynaTime = calculateNextJackynaTime();
     }
-    
-    function triggerHeroineEffect(currentTime) {
+
+    function triggerZeyEffect(currentTime) {
         if (!gameRunning) return;
-        poops = []; 
-        miniBombs = []; // Heroine clears all poops and bombs!
+        // Apply slow effect for 5 seconds (OBJECT_SLOW_DURATION)
+        poops.forEach(poop => {
+            poop.slowedUntil = currentTime + OBJECT_SLOW_DURATION;
+        });
+        miniBombs.forEach(bomb => {
+            bomb.slowedUntil = currentTime + OBJECT_SLOW_DURATION;
+        });
         playSpecialClearSound();
-        heroineVisible = true;
-        heroineHiddenTime = currentTime + HEROINE_SHOW_DURATION; 
-        lastHeroineTime = currentTime;
-        nextHeroineTime = calculateNextHeroineTime();
-        
-        // --- STATUS EFFECT: HEROINE POOP SLOW ---
-        heroineSlowActive = true;
-        heroineSlowEndTime = currentTime + HEROINE_SLOW_DURATION; 
+        zeyVisible = true;
+        zeyHiddenTime = currentTime + ZEY_SHOW_DURATION;
+        lastZeyTime = currentTime;
+        nextZeyTime = calculateNextZeyTime();
     }
 
     function spawnSweet() {
-        const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
+        const x = Math.random() * (canvas.width - 30) + 15;
         const emoji = sweetEmojis[Math.floor(Math.random() * sweetEmojis.length)];
-        sweets.push({ x: x, y: 0, size: 18, emoji: emoji, speed: sweetDropSpeed }); 
+        sweets.push({ x: x, y: 0, size: 18, emoji: emoji, baseSpeed: sweetDropSpeed, slowedUntil: 0 });
     }
 
     function spawnPoop(emoji = poopEmoji) {
-        const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
-        poops.push({ x: x, y: 0, size: 18, emoji: emoji, speed: poopDropSpeed }); 
+        const x = Math.random() * (canvas.width - 30) + 15;
+        poops.push({ x: x, y: 0, size: 18, emoji: emoji, baseSpeed: poopDropSpeed, slowedUntil: 0 });
     }
-    
+
     function spawnMiniBomb() {
         if (miniBombs.length >= 5) return;
-        const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
-        miniBombs.push({ x: x, y: 0, size: 22, emoji: '💥', speed: poopDropSpeed * 1.5 }); // Faster than regular poop
+        const x = Math.random() * (canvas.width - 30) + 15;
+        miniBombs.push({ x: x, y: 0, size: 22, emoji: '💥', baseSpeed: poopDropSpeed * 1.5, slowedUntil: 0 });
     }
 
     function spawnPowerUp(currentTime) {
+        const positions = getCharPositions(canvas.width);
+        // Choose a power-up from the reduced list (no SPEED)
         const drop = angelDrops[Math.floor(Math.random() * angelDrops.length)];
-        
-        powerUps.push({ 
-            x: CHAR_POSITIONS.ANGEL, 
-            y: 40, 
-            size: 24, 
-            emoji: drop.emoji, 
+
+        powerUps.push({
+            x: positions.ANGEL,
+            y: 40,
+            size: 24,
+            emoji: drop.emoji,
             speed: powerUpDropSpeed,
-            type: drop.type // Distinguishes the effect
+            type: drop.type
         });
         angelVisible = true;
         angelHiddenTime = currentTime + ANGEL_SHOW_DURATION;
-        lastAngelTime = currentTime;
+        lastAngelTime = currentTime; // Reset Mandala Cooldown
     }
 
     function applyPowerUp(type) {
-        // Reset power up if already active
-        if (powerUpActive === 'speed') player.speed = player.baseSpeed;
         powerUpActive = null;
-        
+
         if (type === 'heart') {
             if (lives < MAX_LIVES) lives++;
             updateHUD();
-            return; 
-        } 
-        
+            return;
+        }
+
         // Apply new timed power-up
         powerUpActive = type;
         powerUpEndTime = performance.now() + POWER_UP_DURATION;
-        player.invulnerable = false; 
-        
-        if (type === 'speed') {
-            player.speed = player.baseSpeed * 2; 
-        } 
-        // Shield and Magnet effects handled in collision/update logic
-        
+        player.invulnerable = false;
+
         updateHUD();
     }
-    
+
     function updatePowerUpEffects(currentTime) {
         // 1. Handle Power-up Expiration
         if (powerUpActive && currentTime > powerUpEndTime) {
-            if (powerUpActive === 'speed') {
-                player.speed = player.baseSpeed; 
-            }
             powerUpActive = null;
         }
 
@@ -782,28 +933,23 @@
         if (playerSlowed && currentTime > slowEndTime) {
             playerSlowed = false;
         }
-        
-        // 3. Handle Heroine Slow Expiration
-        if (heroineSlowActive && currentTime > heroineSlowEndTime) {
-            heroineSlowActive = false;
-        }
 
-        // 4. Magnet Effect (pull sweets)
+        // 3. Magnet Effect (pull sweets)
         if (powerUpActive === 'magnet') {
             const magnetRange = 80;
             const magnetStrength = 0.5;
-            
+
             sweets.forEach(sweet => {
                 const dx = player.x - sweet.x;
                 const dy = player.y - sweet.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                
+
                 if (distance < magnetRange) {
                     const angle = Math.atan2(dy, dx);
                     // Pull based on distance from player
                     const pullFactor = magnetStrength * (magnetRange - distance) / magnetRange;
-                    
-                    sweet.x += Math.cos(angle) * pullFactor * 5; // Fixed small pull
+
+                    sweet.x += Math.cos(angle) * pullFactor * 5;
                     sweet.y += Math.sin(angle) * pullFactor * 5;
                 }
             });
@@ -811,45 +957,52 @@
     }
 
     function updateObjects(deltaTime) {
-        const factor = deltaTime / 16; 
+        const factor = deltaTime / 16;
         const currentTime = performance.now();
-        
-        // Apply heroine slow factor to poop speed if active
-        const currentPoopSpeed = heroineSlowActive ? poopDropSpeed * 0.3 : poopDropSpeed; 
 
         // Sweets
         sweets = sweets.filter(sweet => {
-            sweet.y += sweet.speed * factor;
-            return sweet.y < CANVAS_HEIGHT + sweet.size;
+            const isSlowed = sweet.slowedUntil && sweet.slowedUntil > currentTime;
+            const currentSpeed = isSlowed ? sweet.baseSpeed * SLOW_FACTOR : sweet.baseSpeed;
+            sweet.y += currentSpeed * factor;
+            // Use canvas.height dynamically
+            return sweet.y < canvas.height + sweet.size;
         });
 
         // Poops
         poops = poops.filter(poop => {
-            // Bombs fall faster than normal poops
-            const speed = poop.emoji === '💣' ? currentPoopSpeed * 1.5 : currentPoopSpeed;
-            poop.y += speed * factor;
-            return poop.y < CANVAS_HEIGHT + poop.size;
+            const isSlowed = poop.slowedUntil && poop.slowedUntil > currentTime;
+            const currentSpeed = isSlowed ? poop.baseSpeed * SLOW_FACTOR : poop.baseSpeed;
+
+            poop.y += currentSpeed * factor;
+            // Use canvas.height dynamically
+            return poop.y < canvas.height + poop.size;
         });
-        
+
         // Power-ups
         powerUps = powerUps.filter(powerUp => {
             powerUp.y += powerUp.speed * factor;
-            return powerUp.y < CANVAS_HEIGHT + powerUp.size;
+            // Use canvas.height dynamically
+            return powerUp.y < canvas.height + powerUp.size;
         });
 
         // Mini-Bombs
         miniBombs = miniBombs.filter(bomb => {
-            bomb.y += bomb.speed * factor;
-            if (bomb.y >= CANVAS_HEIGHT - 10) {
+            const isSlowed = bomb.slowedUntil && bomb.slowedUntil > currentTime;
+            const currentSpeed = isSlowed ? bomb.baseSpeed * SLOW_FACTOR : bomb.baseSpeed;
+
+            bomb.y += currentSpeed * factor;
+            // Use canvas.height dynamically
+            if (bomb.y >= canvas.height - 10) {
                 // Bomb hits the ground - EXPLODE!
                 noGoZones.push({
                     x: bomb.x,
-                    y: CANVAS_HEIGHT - 10,
+                    y: canvas.height - 10,
                     radius: 40,
                     endTime: currentTime + BOMB_EXPLOSION_DURATION
                 });
-                playHitSound(); 
-                return false; 
+                playHitSound();
+                return false;
             }
             return true;
         });
@@ -885,30 +1038,34 @@
         poops = poops.filter(poop => {
             const rRect = { x: poop.x - poop.size / 2, y: poop.y - poop.size / 2, width: poop.size, height: poop.size };
             if (isColliding(pRect, rRect)) {
+                // Check if shielded
                 if (powerUpActive === 'shield') {
                     powerUpActive = null; // Shield breaks
-                    return false;
+                    return false; // Poop is destroyed
                 }
-                
+
+                // Check if invulnerable
                 if (!player.invulnerable) {
                     lives--;
                     updateHUD();
                     playHitSound();
-                    
-                    // --- NEW STATUS EFFECT: PLAYER SLOW ---
+
+                    // STATUS EFFECT: PLAYER SLOW
                     playerSlowed = true;
-                    slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
-                    
+                    slowEndTime = currentTime + PLAYER_SLOW_DURATION;
+
                     player.invulnerable = true;
-                    setTimeout(() => player.invulnerable = false, 500); 
+                    setTimeout(() => player.invulnerable = false, 500);
 
                     if (lives <= 0) { endGame(); }
+                    return false; // Poop is destroyed, player hit
                 }
-                return false;
+                // If player is invulnerable, the poop passes through
+                return true;
             }
             return true;
         });
-        
+
         // 3. Power-Up Collection
         powerUps = powerUps.filter(powerUp => {
             const hRect = { x: powerUp.x - powerUp.size / 2, y: powerUp.y - powerUp.size / 2, width: powerUp.size, height: powerUp.size };
@@ -919,109 +1076,151 @@
             }
             return true;
         });
-        
+
         // 4. Mini-Bomb Collision (immediate explosion on contact)
         miniBombs = miniBombs.filter(bomb => {
             const bRect = { x: bomb.x - bomb.size / 2, y: bomb.y - bomb.size / 2, width: bomb.size, height: bomb.size };
             if (isColliding(pRect, bRect)) {
-                if (powerUpActive !== 'shield' && !player.invulnerable) {
+                // Check if shielded
+                if (powerUpActive === 'shield') {
+                    powerUpActive = null; // Shield breaks
+                    return false; // Bomb is gone, shield broke
+                }
+
+                // Check if invulnerable
+                if (!player.invulnerable) {
                     lives--;
                     updateHUD();
                     playHitSound();
                     playerSlowed = true;
-                    slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
+                    slowEndTime = currentTime + PLAYER_SLOW_DURATION;
                     player.invulnerable = true;
                     setTimeout(() => player.invulnerable = false, 500);
                     if (lives <= 0) { endGame(); }
+                    return false; // Bomb is gone on contact, player hit
                 }
-                powerUpActive = null; // Shield or not, bomb is gone
-                return false; 
+                // If player is invulnerable, the bomb passes through
+                return true;
             }
             return true;
         });
-        
+
         // 5. No-Go Zone Collision (damage on entry)
         const playerCenter = { x: player.x, y: player.y };
         const playerHitZone = noGoZones.some(zone => {
             const dx = playerCenter.x - zone.x;
             const dy = playerCenter.y - zone.y;
-            return (dx * dx + dy * dy) < (zone.radius * zone.radius) && currentTime < zone.endTime;
+            return (dx * dx + dy * dy) < (zone.radius * zone.radius) &&
+                   currentTime < zone.endTime;
         });
-        
-        if (playerHitZone && !player.invulnerable) { 
+
+        if (playerHitZone && !player.invulnerable && powerUpActive !== 'shield') {
             lives--;
             updateHUD();
             playHitSound();
             playerSlowed = true;
-            slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
+            slowEndTime = currentTime + PLAYER_SLOW_DURATION;
             player.invulnerable = true;
             setTimeout(() => player.invulnerable = false, 500);
             if (lives <= 0) { endGame(); }
+        } else if (playerHitZone && powerUpActive === 'shield') {
+            powerUpActive = null; // Shield breaks instantly
         }
     }
 
     function draw() {
-        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         const currentTime = performance.now();
-        
+
+        // Helper function for drawing objects with status effects
+        const drawFallingObject = (obj) => {
+            const isSlowed = obj.slowedUntil && obj.slowedUntil > currentTime;
+            let outlineColor = null;
+
+            // Check if it's a hazard emoji (Poop, Mini-Bomb, or the fast bomb 💣)
+            const isHazard = [poopEmoji, '💣', '💥'].includes(obj.emoji);
+
+            if (isSlowed) {
+                // Cyan for hazards (slowed by Zey), Hot Pink for sweets (slowed by Jackyna)
+                outlineColor = isHazard ? 'rgba(0, 255, 255, 0.8)' : 'rgba(255, 105, 180, 0.8)';
+            }
+
+            if (outlineColor) {
+                ctx.beginPath();
+                ctx.arc(obj.x, obj.y, obj.size * 0.8, 0, Math.PI * 2);
+                ctx.strokeStyle = outlineColor;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            drawEmoji(obj.emoji, obj.x, obj.y, obj.size);
+        };
+
+
         // --- 1. Draw No-Go Zones (Explosions) ---
         noGoZones.forEach(zone => {
-            const radius = zone.radius * (zone.endTime > currentTime ? (zone.endTime - currentTime) / BOMB_EXPLOSION_DURATION : 0); 
-            
+            // Fades out the explosion
+            const lifeRatio = Math.max(0, (zone.endTime - currentTime) / BOMB_EXPLOSION_DURATION);
+            const radius = zone.radius;
+
             ctx.beginPath();
             ctx.arc(zone.x, zone.y, radius, 0, Math.PI * 2);
-            
-            const gradient = ctx.createRadialGradient(zone.x, zone.y, 0, zone.x, zone.y, zone.radius);
-            gradient.addColorStop(0, 'rgba(255, 69, 0, 0.7)'); 
-            gradient.addColorStop(1, 'rgba(255, 69, 0, 0)'); 
-            
+
+            const gradient = ctx.createRadialGradient(zone.x, zone.y, 0, zone.x, zone.y, radius);
+            gradient.addColorStop(0, `rgba(255, 69, 0, ${0.7 * lifeRatio})`);
+            gradient.addColorStop(1, 'rgba(255, 69, 0, 0)');
+
             ctx.fillStyle = gradient;
             ctx.fill();
             ctx.closePath();
         });
 
         // --- 2. Draw Characters and Items ---
-        drawBossAndDevil(); 
-        drawAngel(); 
-        drawWitch(); 
-        drawHeroine(); 
-        
-        // Draw falling objects
-        sweets.forEach(sweet => { drawEmoji(sweet.emoji, sweet.x, sweet.y, sweet.size); });
-        poops.forEach(poop => { drawEmoji(poop.emoji, poop.x, poop.y, poop.size); });
+        drawBossAndDevil();
+        drawAngel();
+        drawJackyna();
+        drawZey();
+
+        // Draw falling objects using the helper
+        sweets.forEach(drawFallingObject);
+        poops.forEach(drawFallingObject);
+        miniBombs.forEach(drawFallingObject);
+
+        // Power-ups don't get slowed, so draw normally
         powerUps.forEach(pu => { drawEmoji(pu.emoji, pu.x, pu.y, pu.size); });
-        miniBombs.forEach(bomb => { drawEmoji(bomb.emoji, bomb.x, bomb.y, bomb.size); });
 
         // --- 3. Draw Player and Effects ---
-        let playerEmoji = playerSlowed ? '🐢' : player.emoji; // Slowed status 
-        
+        let playerEmoji = playerSlowed ? '😵' : player.emoji;
+
         if (powerUpActive === 'shield') {
             ctx.beginPath();
             ctx.arc(player.x, player.y, player.size * 1.2, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(0, 191, 255, 0.8)'; 
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.8)';
             ctx.lineWidth = 4;
             ctx.stroke();
             ctx.closePath();
-        } 
-        
-        ctx.shadowColor = player.invulnerable ? '#ff0000' : (powerUpActive === 'speed' ? '#00ff00' : '#a855f7');
+        }
+
+        // Simplified shadow: Red for invulnerable, default purple otherwise.
+        ctx.shadowColor = player.invulnerable ? '#ff0000' : '#a855f7';
         ctx.shadowBlur = player.invulnerable ? 15 : 12;
         drawEmoji(playerEmoji, player.x, player.y, player.size);
-        ctx.shadowBlur = 0; 
+        ctx.shadowBlur = 0;
     }
-    
+
     function increaseDifficulty() {
-        const poopSpeedIncrement = 0.02; 
+        const poopSpeedIncrement = 0.02;
         const poopSpeedInterval = 10;
-        
+
         if (score >= lastPoopSpeedIncreaseScore + poopSpeedInterval) {
             // Base poop speed increase
             poopDropSpeed += poopSpeedIncrement;
             lastPoopSpeedIncreaseScore = Math.floor(score / poopSpeedInterval) * poopSpeedInterval;
         }
-        
+
         if (score > 0 && score % 50 === 0 && score % 10 !== 0) {
-            sweetDropSpeed += 0.1; 
+            sweetDropSpeed += 0.1;
             player.baseSpeed += 0.05;
             sweetSpawnRate = Math.max(650, sweetSpawnRate - 10);
         }
@@ -1034,24 +1233,25 @@
         if (event.clientX !== undefined) {
             return event.clientX;
         }
-        return null; 
+        return null;
     }
 
     function setPlayerTarget(event) {
-        event.preventDefault(); 
-        if (!gameRunning) return; 
+        event.preventDefault();
+        if (!gameRunning) return;
 
-        isPointerDown = true; 
+        isPointerDown = true;
 
         const clientX = getPointerX(event);
         if (clientX === null) return;
 
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
-        
-        let newX = (clientX - rect.left) * scaleX; 
-        
-        playerMoveToX = Math.max(player.size / 2, Math.min(CANVAS_WIDTH - player.size / 2, newX));
+
+        let newX = (clientX - rect.left) * scaleX;
+
+        // Player target is clamped based on dynamic canvas width
+        playerMoveToX = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, newX));
     }
 
     function releasePointer(event) {
@@ -1059,21 +1259,20 @@
             isPointerDown = false;
         }
     }
-    
+
     function setupInputListeners() {
+        // Use pointer events for unified touch/mouse input
         canvas.addEventListener('pointerdown', setPlayerTarget);
         canvas.addEventListener('pointermove', setPlayerTarget);
         canvas.addEventListener('pointerup', releasePointer);
-        canvas.addEventListener('pointerleave', releasePointer); 
-        
-        canvas.addEventListener('touchstart', setPlayerTarget);
-        canvas.addEventListener('touchmove', setPlayerTarget);
-        canvas.addEventListener('touchend', releasePointer);
-        canvas.addEventListener('touchcancel', releasePointer);
+        canvas.addEventListener('pointerleave', releasePointer);
+
+        // Resize listeners for responsiveness
+        window.addEventListener('resize', resizeGame);
         
         canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
-    
+
     function movePlayer(deltaTime) {
         if (!isPointerDown) {
             return;
@@ -1082,75 +1281,78 @@
         const factor = deltaTime / 16;
         const dx = playerMoveToX - player.x;
         const distance = Math.abs(dx);
-        // Use player.speed which is adjusted by effects
-        const step = player.speed * factor; 
+        // Use player.speed which is adjusted by effects and slow status
+        const step = player.speed * factor;
 
         if (distance > step) {
             player.x += Math.sign(dx) * step;
         } else {
             player.x = playerMoveToX;
         }
+
+        // CRITICAL FIX: Final clamping to prevent passing the walls
+        player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
     }
 
     function updateHUD() {
         scoreDisplay.textContent = score;
-        livesDisplay.innerHTML = '❤️ '.repeat(Math.min(lives, MAX_LIVES));
+        // Draw hearts based on lives
+        livesDisplay.innerHTML = '❤️'.repeat(Math.min(lives, MAX_LIVES));
         if (lives <= 0) { livesDisplay.innerHTML = '💔'; }
-        
+
         const currentTime = performance.now();
-        
+
         // Update player speed and emoji based on active effects
-        const currentBaseSpeed = playerSlowed ? player.baseSpeed * 0.5 : player.baseSpeed;
-        player.speed = (powerUpActive === 'speed' && !playerSlowed) ? player.baseSpeed * 2 : currentBaseSpeed;
-        
-        player.emoji = playerSlowed ? '🐢' : '😋';
+        player.speed = playerSlowed ? player.baseSpeed * 0.5 : player.baseSpeed;
+
+        player.emoji = playerSlowed ? '😵' : '😋';
 
         // --- HUD Bar Cooldowns ---
-        
-        const remainingWitchTime = Math.max(0, nextWitchTime - currentTime);
-        const totalWitchTime = WITCH_MAX_INTERVAL + WITCH_MIN_INTERVAL / 2; // Average total
-        const witchPercent = Math.min(100, (remainingWitchTime / totalWitchTime) * 100);
 
-        const remainingHeroineTime = Math.max(0, nextHeroineTime - currentTime);
-        const totalHeroineTime = HEROINE_MAX_INTERVAL + HEROINE_MIN_INTERVAL / 2; // Average total
-        const heroinePercent = Math.min(100, (remainingHeroineTime / totalHeroineTime) * 100);
-        
-        // Witch Bar (Fills up when ready)
-        witchBar.style.width = `${100 - witchPercent}%`;
-        witchBar.style.backgroundColor = witchPercent > 0 ? '#ef4444' : '#10b981'; 
-        
-        // Heroine Bar (Fills up when ready)
-        heroineBar.style.width = `${100 - heroinePercent}%`;
-        heroineBar.style.backgroundColor = heroinePercent > 0 ? '#3b82f6' : '#10b981';
+        // 1. Mandala Bar (Angel Power-up Cooldown)
+        const totalMandalaTime = ANGEL_INTERVAL;
+        // How much time has passed since the last power-up drop
+        const elapsedTime = currentTime - lastAngelTime;
+        const remainingMandalaTime = Math.max(0, ANGEL_INTERVAL - elapsedTime);
+        const mandalaPercent = Math.min(100, (remainingMandalaTime / totalMandalaTime) * 100);
+
+        mandalaBar.style.width = `${100 - mandalaPercent}%`;
+        // Purple when waiting, Green when ready
+        mandalaBar.style.backgroundColor = remainingMandalaTime > 0 ? '#a855f7' : '#10b981';
+
+        // 2. Zey Bar (Poop Clear Cooldown)
+        const totalZeyTime = ZEY_MAX_INTERVAL;
+        const remainingZeyTime = Math.max(0, nextZeyTime - currentTime);
+        const zeyPercent = Math.min(100, (remainingZeyTime / totalZeyTime) * 100);
+
+        zeyBar.style.width = `${100 - zeyPercent}%`;
+        zeyBar.style.backgroundColor = zeyPercent > 0 ? '#3b82f6' : '#10b981';
+
+        // 3. Jackyna Bar (Sweet Clear Cooldown)
+        const totalJackynaTime = JACKYNA_MAX_INTERVAL;
+        const remainingJackynaTime = Math.max(0, nextJackynaTime - currentTime);
+        const jackynaPercent = Math.min(100, (remainingJackynaTime / totalJackynaTime) * 100);
+
+        jackynaBar.style.width = `${100 - jackynaPercent}%`;
+        jackynaBar.style.backgroundColor = jackynaPercent > 0 ? '#ef4444' : '#10b981';
     }
 
     function showMessage(title, text, buttons) {
         document.getElementById('messageTitle').textContent = title;
-        const llmResponseContainer = document.getElementById('llmResponseContainer'); 
+        const llmResponseContainer = document.getElementById('llmResponseContainer');
         llmResponseContainer.classList.add('hidden');
         document.getElementById('llmResponseText').textContent = '';
-        
-        const instructionTag = '$$INSTRUCTION$$';
+
         let formattedText = text;
 
-        if (text.includes(instructionTag)) {
-            const parts = text.split(instructionTag);
-            
-            const instructionHtml = `<span class="intro-instruction">${parts[1]}</span>`;
-            
-            formattedText = parts[0].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') +
-                            instructionHtml +
-                            parts[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-        } else {
-            formattedText = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
-        }
-            
+        // Simplified text formatting - removed the custom instruction tag logic
+        formattedText = text
+            .replace(/\n/g, '<br>');
+
         document.getElementById('messageText').innerHTML = formattedText;
-        
+
         buttonArea.innerHTML = '';
-        
+
         buttons.forEach(btn => {
             const button = document.createElement('button');
             button.id = btn.id;
@@ -1158,10 +1360,13 @@
             button.textContent = btn.text;
             button.onclick = btn.action;
             button.disabled = false;
-            
+
             buttonArea.appendChild(button);
         });
-        
+
+        // Ensure leaderboard is hidden initially when message box shows
+        leaderboardDisplay.classList.add('hidden');
+
         messageBox.style.display = 'flex';
     }
 
@@ -1177,93 +1382,90 @@
 
         const deltaTime = currentTime - lastTime;
         lastTime = currentTime;
-        
+
         // --- BOSS/DEVIL LOGIC ---
         const scoreMilestone = Math.floor(score / BOSS_INTERVAL_SCORE);
-        const shouldBeBoss = scoreMilestone > 0 && scoreMilestone % 2 !== 0; 
-        
+        const shouldBeBoss = scoreMilestone > 0 && scoreMilestone % 2 !== 0;
+
         if (shouldBeBoss && !nulliBossActive) {
             // START BOSS PHASE
             nulliBossActive = true;
             bossEndTime = currentTime + BOSS_DURATION;
             poopDropSpeed *= 1.5; // Boss speed boost
             player.baseSpeed *= 0.7; // Player speed reduction during boss
-            player.speed *= 0.7;
-            console.log("BOSS START");
-        } 
-        
+        }
+
         if (nulliBossActive && currentTime > bossEndTime) {
             // END BOSS PHASE
             nulliBossActive = false;
-            poopDropSpeed /= 1.5; 
+            poopDropSpeed /= 1.5;
             player.baseSpeed /= 0.7;
-            player.speed /= 0.7;
-            console.log("BOSS END");
         }
-        
+
         // Spawning Logic
         if (currentTime - lastSweetTime > sweetSpawnRate) {
             spawnSweet();
             lastSweetTime = currentTime;
         }
-        
+
         // Poop/Bomb Spawning
         if (nulliBossActive) {
              // Boss always drops fast '💣' poops
              if (currentTime - lastPoopTime > 500) {
-                 spawnPoop('💣'); 
+                 spawnPoop('💣');
                  lastPoopTime = currentTime;
              }
         } else {
              // Devil (Normal Poop) spawning
              if (currentTime - lastPoopTime > poopSpawnRate) {
-                spawnPoop(poopEmoji); 
+                spawnPoop(poopEmoji);
                 lastPoopTime = currentTime;
              }
-             // Mini-Bomb Spawning (NEW)
+             // Mini-Bomb Spawning
              if (score >= MINI_BOMB_SCORE_START && currentTime - lastBombTime > BOMB_SPAWN_INTERVAL) {
                  spawnMiniBomb();
                  lastBombTime = currentTime;
              }
         }
-        
-        // Character Cooldown Logic
-        if (powerUps.length === 0 && currentTime - lastAngelTime > ANGEL_INTERVAL) {
-            spawnPowerUp(currentTime); 
-        }
-        
-        if (angelVisible && currentTime > angelHiddenTime) { angelVisible = false; }
-        if (witchVisible && currentTime > witchHiddenTime) { witchVisible = false; }
-        if (heroineVisible && currentTime > heroineHiddenTime) { heroineVisible = false; }
 
-        if (!witchVisible && currentTime >= nextWitchTime) { triggerWitchEffect(currentTime); }
-        if (!heroineVisible && currentTime >= nextHeroineTime) { triggerHeroineEffect(currentTime); }
+        // Character Cooldown Logic
+        // Mandala (Angel) drops a power-up when cooldown is over AND no power-ups are currently falling
+        if (powerUps.length === 0 && currentTime - lastAngelTime > ANGEL_INTERVAL) {
+            spawnPowerUp(currentTime);
+        }
+
+        if (angelVisible && currentTime > angelHiddenTime) { angelVisible = false; }
+        if (jackynaVisible && currentTime > jackynaHiddenTime) { jackynaVisible = false; }
+        if (zeyVisible && currentTime > zeyHiddenTime) { zeyVisible = false; }
+
+        if (!jackynaVisible && currentTime >= nextJackynaTime) { triggerJackynaEffect(currentTime); }
+        if (!zeyVisible && currentTime >= nextZeyTime) { triggerZeyEffect(currentTime); }
 
         movePlayer(deltaTime);
-        updatePowerUpEffects(currentTime); // NEW: Manage timed effects
+        updatePowerUpEffects(currentTime);
         updateObjects(deltaTime);
         checkCollisions();
         increaseDifficulty();
-        updateHUD(); 
+        updateHUD();
 
         gameLoopId = requestAnimationFrame(gameLoop);
         draw();
     }
-    
+
     function startGame() {
         if (gameRunning) return;
-        
+
         resetGame();
         playStartSound();
         gameRunning = true;
-        
+
         lastTime = performance.now();
-        lastAngelTime = lastTime; 
-        lastWitchTime = lastTime;
-        lastHeroineTime = lastTime;
-        nextWitchTime = calculateNextWitchTime(); 
-        nextHeroineTime = calculateNextHeroineTime();
-        
+        lastAngelTime = lastTime;
+        lastJackynaTime = lastTime;
+        lastZeyTime = lastTime;
+        nextJackynaTime = calculateNextJackynaTime();
+        nextZeyTime = calculateNextZeyTime();
+
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
@@ -1274,18 +1476,17 @@
         lives = 3;
         sweets = [];
         poops = [];
-        powerUps = []; 
+        powerUps = [];
         miniBombs = [];
         noGoZones = [];
 
         // Reset all effects and timing
-        lastAngelTime = performance.now(); 
+        lastAngelTime = performance.now(); // Reset Mandala timer
         angelVisible = false;
-        witchVisible = false;
-        heroineVisible = false;
+        jackynaVisible = false;
+        zeyVisible = false;
         powerUpActive = null;
         playerSlowed = false;
-        heroineSlowActive = false;
         nulliBossActive = false;
         lastBombTime = 0;
 
@@ -1296,23 +1497,25 @@
         poopSpawnRate = 1100;
         player.baseSpeed = 9;
         player.speed = 9;
-        player.x = CANVAS_WIDTH / 2;
-        playerMoveToX = CANVAS_WIDTH / 2;
+        
+        // Reset player position using the dynamically resized canvas width
+        player.x = canvas.width / 2;
+        playerMoveToX = canvas.width / 2;
         isPointerDown = false;
         lastPoopSpeedIncreaseScore = 0;
-        
+
         updateHUD();
-        draw(); 
+        draw();
         hideMessage();
     }
 
     async function submitScoreAndRestart(finalScore) {
         const input = document.getElementById('playerNameInput');
         const name = input ? input.value.trim() : "Anonymous";
-        
+
         const button = document.getElementById('submitButton');
-        if (button) button.disabled = true; 
-        
+        if (button) button.disabled = true;
+
         try {
             await saveHighScore(name, finalScore);
         } catch(err) {
@@ -1328,10 +1531,10 @@
         cancelAnimationFrame(gameLoopId);
         stopAllSounds();
         playGameOverSound();
-        
+
         const finalScore = score;
-        
-        const messageContent = `The 😈 got you! Your **total score** is **${finalScore}**.<br><br>
+
+        const messageContent = `The 😈 got you! Your total score is ${finalScore}.<br><br>
 
 Enter your name to record your high score on the permanent, competitive leaderboard:
 <div class="mt-3">
@@ -1339,44 +1542,28 @@ Enter your name to record your high score on the permanent, competitive leaderbo
 </div>`;
 
         const buttons = [
-            { 
-                id: 'finalWordButton', 
-                text: '✨ View Final Word', 
-                action: () => showFinalWord(finalScore), 
-                className: 'button-llm' 
+            {
+                id: 'finalWordButton',
+                text: '✨ View Final Word',
+                action: () => showFinalWord(finalScore),
+                className: 'button-llm'
             },
-            { 
-                id: 'submitButton', 
-                text: 'Submit Score & Play Again', 
-                action: () => submitScoreAndRestart(finalScore), 
-                className: 'button-submit' 
+            {
+                id: 'leaderboardButton', // Button to toggle the leaderboard
+                text: 'View Top Sweet Collectors 🏆',
+                action: () => toggleLeaderboard(document.getElementById('leaderboardButton')),
+                className: ''
+            },
+            {
+                id: 'submitButton',
+                text: 'Submit Score & Play Again',
+                action: () => submitScoreAndRestart(finalScore),
+                className: 'button-submit'
             }
         ];
 
         showMessage("GAME OVER!", messageContent, buttons);
         setTimeout(() => { document.getElementById('playerNameInput')?.focus(); }, 100);
-    }
-    
-    function showIntroMessage() {
-        const instructionTag = '$$INSTRUCTION$$';
-        
-        const introText = `Welcome to **😈 Poopocalypse: Nulli Rising 🧙**! You control 😋 to collect treats (🍬, 🍭) and score points! Avoid the repulsive 💩 from evil **Jehannum** (😈) and his explosive **Mini-Bombs** (💥). Every **500 points**, face the terrifying **Nulli Boss** (👹)!
-
-Look for the 😇 angel **Mandala** (drops **Power-Ups** - 🛡️, 🧲, ⚡), the 🧝‍♀️ heroine **Zey** (clears all 💩!), and the 🧙‍♀️ witch **Jackyna** (clears all treats!).
-
-Watch the **HUD bars** for when the Witch and Heroine are ready!
-
-${instructionTag}Move 😋 with your finger to avoid disaster!${instructionTag}`;
-
-        const buttons = [
-            { id: 'startButton', text: "Let's Go!", action: startGame, className: 'button-submit' }
-        ];
-
-        showMessage(
-            "😈 Poopocalypse: Nulli Rising 🧙",
-            introText,
-            buttons
-        );
     }
 
     // --- Initialization & Launcher ---
@@ -1384,9 +1571,10 @@ ${instructionTag}Move 😋 with your finger to avoid disaster!${instructionTag}`
     function showGame() {
         launcherContainer.style.display = 'none';
         gameContainer.style.display = 'flex';
-        showIntroMessage();
+        resizeGame(); // Perform initial resize to set up canvas dimensions
+        startGame(); // Start the game immediately
     }
-    
+
     function setupLauncher() {
         launchButton.addEventListener('click', () => {
             playLaunchSound();
@@ -1395,18 +1583,18 @@ ${instructionTag}Move 😋 with your finger to avoid disaster!${instructionTag}`
     }
 
     async function init() {
-        canvas.width = CANVAS_WIDTH;
-        canvas.height = CANVAS_HEIGHT;
-        
-        setupLauncher(); 
-        setupInputListeners(); 
-        
+        // Initial setup for the canvas to ensure it fits the responsive styles
+        resizeGame(); 
+
+        setupLauncher();
+        setupInputListeners();
+
         await setupFirebase();
-        
+
         if (db) {
-            loadHighScores(); 
+            loadHighScores();
         }
-        
+
         resetGame();
     }
 
