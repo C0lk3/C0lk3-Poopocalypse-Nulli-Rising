@@ -7,8 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Tone.js for sound effects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.52/Tone.js"></script>
+    
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.52/Tone.js"></script>
     
     <style>
         /* --- General Variables & Body --- */
@@ -68,6 +69,7 @@
             cursor: pointer;
             transition: all 0.15s ease;
             box-shadow: 0 4px #006400;
+            user-select: none;
             text-transform: uppercase;
         }
         .launch-button:hover {
@@ -138,18 +140,6 @@
             color: black;
         }
         
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #00f800;
-            border-radius: 50%;
-            width: 1.2rem;
-            height: 1.2rem;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-        
         #messageBox {
             position: fixed; 
             top: 0;
@@ -210,6 +200,16 @@
             padding: 0.3rem;
         }
         
+        /* This style specifically targets the intro message instruction text to use a readable font */
+        .intro-instruction {
+            font-family: 'Inter', sans-serif !important; 
+            font-weight: 700;
+            color: #00f800; 
+            font-size: 1.1rem;
+            display: block; /* To ensure it takes up its own line for emphasis */
+            margin-top: 0.75rem;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 640px) {
             .main-title {
@@ -223,7 +223,7 @@
 </head>
 <body>
 
-<!-- --- 1. THE LAUNCHER CONTAINER (Initially Visible) --- -->
+
 <div id="launcherContainer" class="flex flex-col">
     <div class="main-title">😈 POOPOCALYPSE: NULLI RISING 🧙</div>
 
@@ -236,7 +236,7 @@
     </button>
 </div>
 
-<!-- --- 2. THE GAME CONTAINER (Initially Hidden) --- -->
+
 <div id="gameContainer" class="game-container">
     <h1 class="game-title">😈 POOPOCALYPSE: NULLI RISING 🧙</h1>
     
@@ -246,6 +246,18 @@
     </div>
 
     <canvas id="gameCanvas" width="280" height="280"></canvas>
+    
+    <!-- NEW HUD Panel for Cooldowns -->
+    <div id="hudPanel" class="w-full p-2 mt-2 flex justify-around gap-2 text-xs font-bold">
+        <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
+            <div class="absolute inset-0 text-center text-white z-10">🧙‍♀️ WITCH</div>
+            <div id="witchBar" class="h-4 bg-red-500 transition-all duration-100" style="width: 100%;"></div>
+        </div>
+        <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
+            <div class="absolute inset-0 text-center text-white z-10">🧝‍♀️ HEROINE</div>
+            <div id="heroineBar" class="h-4 bg-blue-500 transition-all duration-100" style="width: 100%;"></div>
+        </div>
+    </div>
     
     <div class="leaderboard-card">
         <h2 class="text-base font-bold text-center text-yellow-500 mb-1 font-['Press Start 2P']">🏆 Top Sweet Collectors 🏆</h2>
@@ -264,7 +276,7 @@
     </div>
 </div>
 
-<!-- --- 3. MESSAGE BOX (Game Over / Intro) --- -->
+
 <div id="messageBox">
     <div>
         <h2 id="messageTitle"></h2>
@@ -277,16 +289,20 @@
         <p id="messageText" class="mt-3 mb-0"></p>
         
         <div id="buttonArea" class="flex flex-col md:flex-row justify-center items-center gap-2 mt-4">
-            <!-- Buttons dynamically inserted here -->
-        </div>
+            
+
+</div>
     </div>
 </div>
 
-<!-- --- 4. MAIN GAME SCRIPT (Module) --- -->
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // Set Firestore log level to debug for troubleshooting
+    setLogLevel('Debug');
     
     // --- PRE-WRITTEN DIALOGUE (omitted for brevity) ---
     const PRE_WRITTEN_DIALOGUE = {
@@ -299,7 +315,7 @@
             "Look at those numbers! An ethereal harvest! May your next run bring even greater glory to the FA Clan's cause.",
             "You have achieved true purity of purpose. This high score ensures your name is sung throughout the halls of the heavens!",
             "Divine! The Nulli's attempts were futile against such masterful collection. Keep your spirit bright and your bucket full!",
-            "I grant you my blessing for this outstanding result. Your diligence in gathering sweets is an inspiration to all.",
+            "I grant you my blessing for this outstanding result. Your diligence in gathering sweets is an an inspiration to all.",
             "The Poopocalypse is temporarily subdued! Your score shines like a thousand suns. Thank you for your service to the sweet cause."
         ],
         low: [
@@ -327,12 +343,17 @@
     const messageBox = document.getElementById('messageBox');
     const highScoresBody = document.getElementById('highScoresBody');
     const buttonArea = document.getElementById('buttonArea'); 
+    
+    // NEW HUD ELEMENTS
+    const witchBar = document.getElementById('witchBar');
+    const heroineBar = document.getElementById('heroineBar');
 
     const CANVAS_WIDTH = 280;
     const CANVAS_HEIGHT = 280;
     const MAX_LIVES = 5; 
     
-    const ANGEL_INTERVAL = 60000;
+    // Character cooldowns
+    const ANGEL_INTERVAL = 40000;
     const ANGEL_SHOW_DURATION = 1000;
     const WITCH_MIN_INTERVAL = 20000;
     const WITCH_MAX_INTERVAL = 40000;
@@ -341,60 +362,111 @@
     const HEROINE_MAX_INTERVAL = 30000;
     const HEROINE_SHOW_DURATION = 500;
 
+    // Game State
     let gameLoopId;
     let score = 0;
     let lives = 3;
     let gameRunning = false;
     let playerMoveToX = CANVAS_WIDTH / 2;
     let isPointerDown = false; 
-    let lastAngelTime = 0; 
+    let lastTime = 0;
     
     let angelVisible = false;
     let angelHiddenTime = 0;
+    let lastAngelTime = 0; // For tracking cooldown
+
     let witchVisible = false;
     let witchHiddenTime = 0;
+    let lastWitchTime = 0; // For tracking cooldown
     let nextWitchTime = 0;
+    
     let heroineVisible = false;
     let heroineHiddenTime = 0;
+    let lastHeroineTime = 0; // For tracking cooldown
     let nextHeroineTime = 0;
     
     let db, auth, userId;
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
+    // Player and Objects
     const player = { 
         x: CANVAS_WIDTH / 2, 
         y: CANVAS_HEIGHT - 30, 
         size: 30, 
         emoji: '😋', 
-        speed: 9 
+        baseSpeed: 9,
+        speed: 9,
+        invulnerable: false // For collision buffer after hit/in zone
     };
+    
     let sweets = [];
     let poops = [];
-    let hearts = []; 
+    let powerUps = []; // Renamed from hearts
+    let miniBombs = [];
+    let noGoZones = []; // { x, y, radius, endTime }
+    const BOMB_EXPLOSION_DURATION = 2500; // 2.5 seconds
+    const MINI_BOMB_SCORE_START = 200;
+    let lastBombTime = 0;
+    const BOMB_SPAWN_INTERVAL = 3500;
     
-    let audioContext = null;
-    let currentSoundNode = null;
+    // Status Effects State
+    let powerUpActive = null; // 'shield', 'magnet', 'speed'
+    const POWER_UP_DURATION = 8000; // 8 seconds
+    let powerUpEndTime = 0;
+    
+    let playerSlowed = false; // Player status
+    const PLAYER_SLOW_DURATION = 3000; 
+    let slowEndTime = 0;
+    
+    let heroineSlowActive = false; // Heroine ability status
+    const HEROINE_SLOW_DURATION = 3000; 
+    let heroineSlowEndTime = 0;
+    
+    // Boss State
+    let nulliBossActive = false;
+    const BOSS_INTERVAL_SCORE = 500;
+    const BOSS_DURATION = 10000; // 10 seconds
+    let bossEndTime = 0;
 
-    const sweetEmojis = ['🍬', '🍭', '🍩', '🍫', '🍦'];
-    const poopEmoji = '💩';
-    const devilEmoji = '😈';
-    const angelEmoji = '😇'; 
-    const heartEmoji = '💖'; 
-    const witchEmoji = '🧙‍♀️'; 
-    const heroineEmoji = '🧝‍♀️'; 
-    
+
+    // Object properties
     let sweetDropSpeed = 1.4; 
     let poopDropSpeed = 2.4;  
-    let heartDropSpeed = 0.9; 
+    let powerUpDropSpeed = 0.9; 
     let sweetSpawnRate = 1600; 
     let poopSpawnRate = 1100;
     let lastSweetTime = 0;
     let lastPoopTime = 0;
-    let lastTime = 0;
-    
     let lastPoopSpeedIncreaseScore = 0; 
+    
+    // Emojis & Positions
+    const sweetEmojis = ['🍬', '🍭', '🍩', '🍫', '🍦'];
+    const poopEmoji = '💩';
+    const devilEmoji = '😈';
+    const angelEmoji = '😇'; 
+    const witchEmoji = '🧙‍♀️'; 
+    const heroineEmoji = '🧝‍♀️'; 
+    const nulliBossEmoji = '👹';
+    
+    const POWER_UP_DROPS = {
+        HEART: { emoji: '💖', type: 'heart' },
+        SHIELD: { emoji: '🛡️', type: 'shield' },
+        MAGNET: { emoji: '🧲', type: 'magnet' },
+        SPEED: { emoji: '⚡', type: 'speed' }
+    };
+    const angelDrops = [POWER_UP_DROPS.HEART, POWER_UP_DROPS.SHIELD, POWER_UP_DROPS.MAGNET, POWER_UP_DROPS.SPEED];
 
-    // --- Sound Logic ---
+    const CHAR_POSITIONS = {
+        ANGEL: CANVAS_WIDTH / 2 - 80,
+        HEROINE: CANVAS_WIDTH / 2 - 40,
+        DEVIL: CANVAS_WIDTH / 2,
+        WITCH: CANVAS_WIDTH / 2 + 40
+    };
+
+    let audioContext = null;
+    let currentSoundNode = null;
+
+    // --- Sound Logic (omitted helper functions, using direct calls) ---
     function playTone(freq, duration = 0.1, type = 'square', volume = 0.5) {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -428,7 +500,7 @@
     }
 
     function playCollectSweetSound() { playTone(880, 0.05, 'sine', 0.4); }
-    function playCollectHeartSound() { playTone(1200, 0.1, 'sine', 0.6); }
+    function playCollectPowerUpSound() { playTone(1200, 0.1, 'sine', 0.6); } // Used for all drops
     function playHitSound() { playTone(110, 0.4, 'square', 0.8); }
     function playGameOverSound() { playTone(50, 1.5, 'triangle', 0.9); }
     function playStartSound() { playTone(440, 0.05, 'sine'); playTone(660, 0.1, 'sine'); }
@@ -456,43 +528,41 @@
         }
     }
 
-    async function generateThematicDialogue(finalScore) {
+    function showFinalWord(finalScore) {
         const clanLabel = document.getElementById('clanLabel');
         const llmResponseContainer = document.getElementById('llmResponseContainer'); 
         const llmResponseText = document.getElementById('llmResponseText');
-        const geminiButton = document.getElementById('geminiButton'); 
+        const finalWordButton = document.getElementById('finalWordButton'); 
         
-        llmResponseContainer.classList.add('hidden');
-        geminiButton.disabled = true;
-        llmResponseText.innerHTML = '<div class="loading-spinner"></div> Summoning final word...';
+        const isVisible = !llmResponseContainer.classList.contains('hidden');
         
-        await new Promise(resolve => setTimeout(resolve, 800)); 
-
-        const isHighScore = finalScore >= 300; // Threshold for high/low response
-        
-        try {
-            const result = getRandomDialogue(isHighScore);
+        if (isVisible) {
+            llmResponseContainer.classList.add('hidden');
+            llmResponseText.innerHTML = '';
+            finalWordButton.textContent = '✨ View Final Word';
+        } else {
+            const isHighScore = finalScore >= 300; 
             
-            const { text, characterName, emoji, clanName } = result;
+            try {
+                const result = getRandomDialogue(isHighScore);
+                const { text, characterName, emoji, clanName } = result;
 
-            llmResponseText.innerHTML = `**${characterName} ${emoji}:** ${text.trim()}`;
-            llmResponseContainer.classList.remove('hidden');
-            clanLabel.textContent = `Final Word from the ${clanName}:`;
+                llmResponseText.innerHTML = `<strong>${characterName} ${emoji}:</strong> ${text.trim()}`;
+                llmResponseContainer.classList.remove('hidden');
+                clanLabel.textContent = `Final Word from the ${clanName}:`;
+                finalWordButton.textContent = 'Hide Final Word'; 
 
-        } catch (error) {
-            console.error("Dialogue generation failed:", error);
-            llmResponseText.innerHTML = `**Error:** The message scrolls off the screen! Try again.`;
-            llmResponseContainer.classList.remove('hidden');
-
-        } finally {
-            geminiButton.disabled = false;
+            } catch (error) {
+                console.error("Dialogue generation failed:", error);
+                llmResponseText.innerHTML = `**Error:** Internal data error. Try again.`;
+                llmResponseContainer.classList.remove('hidden');
+            }
         }
     }
     
-    // --- Firebase & Firestore Setup ---
+    // --- Firebase & Firestore Setup (unchanged from previous version) ---
 
     function getHighScoresCollectionRef() {
-        // Path for public/shared data: /artifacts/{appId}/public/data/highscores
         return collection(db, `artifacts/${appId}/public/data/highscores`);
     }
 
@@ -525,7 +595,6 @@
         }
 
         try {
-            // This is where the permanent, public score is saved
             await addDoc(getHighScoresCollectionRef(), {
                 name: name.substring(0, 20) || "Anonymous", 
                 score: score,
@@ -541,17 +610,14 @@
     function loadHighScores() {
         if (!db) return;
 
-        // Query to listen for all scores
         const q = query(getHighScoresCollectionRef(), where("score", ">", 0)); 
         
-        // onSnapshot listens for real-time changes to the leaderboard
         onSnapshot(q, (querySnapshot) => {
             const scores = [];
             querySnapshot.forEach((doc) => {
                 scores.push(doc.data());
             });
             
-            // Client-side sort is REQUIRED since orderBy() is avoided
             scores.sort((a, b) => b.score - a.score);
             
             renderHighScores(scores.slice(0, 10));
@@ -588,12 +654,6 @@
     }
 
     // --- Game Logic ---
-    const CHAR_POSITIONS = {
-        ANGEL: CANVAS_WIDTH / 2 - 80,
-        HEROINE: CANVAS_WIDTH / 2 - 40,
-        DEVIL: CANVAS_WIDTH / 2,
-        WITCH: CANVAS_WIDTH / 2 + 40
-    };
     
     function drawEmoji(emoji, x, y, size) {
         ctx.font = `${size}px sans-serif`;
@@ -601,7 +661,18 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(emoji, x, y);
     }
-    function drawDevil() { drawEmoji(devilEmoji, CHAR_POSITIONS.DEVIL, 20, 30); }
+    
+    function drawBossAndDevil() { 
+        if (nulliBossActive) {
+            ctx.shadowColor = '#ff4500';
+            ctx.shadowBlur = 15;
+            drawEmoji(nulliBossEmoji, CHAR_POSITIONS.DEVIL, 20, 40); // Nulli Boss (👹)
+            ctx.shadowBlur = 0;
+        } else {
+            drawEmoji(devilEmoji, CHAR_POSITIONS.DEVIL, 20, 30); // Devil (😈)
+        }
+    }
+    
     function drawAngel() { if (angelVisible) { drawEmoji(angelEmoji, CHAR_POSITIONS.ANGEL, 20, 30); } }
     function drawWitch() { if (witchVisible) { drawEmoji(witchEmoji, CHAR_POSITIONS.WITCH, 20, 30); } }
     function drawHeroine() { if (heroineVisible) { drawEmoji(heroineEmoji, CHAR_POSITIONS.HEROINE, 20, 30); } }
@@ -622,18 +693,24 @@
         playSpecialClearSound();
         witchVisible = true;
         witchHiddenTime = currentTime + WITCH_SHOW_DURATION; 
+        lastWitchTime = currentTime;
         nextWitchTime = calculateNextWitchTime();
     }
     
     function triggerHeroineEffect(currentTime) {
         if (!gameRunning) return;
         poops = []; 
+        miniBombs = []; // Heroine clears all poops and bombs!
         playSpecialClearSound();
         heroineVisible = true;
         heroineHiddenTime = currentTime + HEROINE_SHOW_DURATION; 
+        lastHeroineTime = currentTime;
         nextHeroineTime = calculateNextHeroineTime();
+        
+        // --- STATUS EFFECT: HEROINE POOP SLOW ---
+        heroineSlowActive = true;
+        heroineSlowEndTime = currentTime + HEROINE_SLOW_DURATION; 
     }
-
 
     function spawnSweet() {
         const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
@@ -641,52 +718,159 @@
         sweets.push({ x: x, y: 0, size: 18, emoji: emoji, speed: sweetDropSpeed }); 
     }
 
-    function spawnPoop() {
+    function spawnPoop(emoji = poopEmoji) {
         const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
-        poops.push({ x: x, y: 0, size: 18, emoji: poopEmoji, speed: poopDropSpeed }); 
+        poops.push({ x: x, y: 0, size: 18, emoji: emoji, speed: poopDropSpeed }); 
     }
     
-    function spawnHeart(currentTime) {
-        hearts.push({ 
+    function spawnMiniBomb() {
+        if (miniBombs.length >= 5) return;
+        const x = Math.random() * (CANVAS_WIDTH - 30) + 15;
+        miniBombs.push({ x: x, y: 0, size: 22, emoji: '💥', speed: poopDropSpeed * 1.5 }); // Faster than regular poop
+    }
+
+    function spawnPowerUp(currentTime) {
+        const drop = angelDrops[Math.floor(Math.random() * angelDrops.length)];
+        
+        powerUps.push({ 
             x: CHAR_POSITIONS.ANGEL, 
             y: 40, 
-            size: 18, 
-            emoji: heartEmoji, 
-            speed: heartDropSpeed 
+            size: 24, 
+            emoji: drop.emoji, 
+            speed: powerUpDropSpeed,
+            type: drop.type // Distinguishes the effect
         });
         angelVisible = true;
         angelHiddenTime = currentTime + ANGEL_SHOW_DURATION;
+        lastAngelTime = currentTime;
+    }
+
+    function applyPowerUp(type) {
+        // Reset power up if already active
+        if (powerUpActive === 'speed') player.speed = player.baseSpeed;
+        powerUpActive = null;
+        
+        if (type === 'heart') {
+            if (lives < MAX_LIVES) lives++;
+            updateHUD();
+            return; 
+        } 
+        
+        // Apply new timed power-up
+        powerUpActive = type;
+        powerUpEndTime = performance.now() + POWER_UP_DURATION;
+        player.invulnerable = false; 
+        
+        if (type === 'speed') {
+            player.speed = player.baseSpeed * 2; 
+        } 
+        // Shield and Magnet effects handled in collision/update logic
+        
+        updateHUD();
+    }
+    
+    function updatePowerUpEffects(currentTime) {
+        // 1. Handle Power-up Expiration
+        if (powerUpActive && currentTime > powerUpEndTime) {
+            if (powerUpActive === 'speed') {
+                player.speed = player.baseSpeed; 
+            }
+            powerUpActive = null;
+        }
+
+        // 2. Handle Player Slow Expiration
+        if (playerSlowed && currentTime > slowEndTime) {
+            playerSlowed = false;
+        }
+        
+        // 3. Handle Heroine Slow Expiration
+        if (heroineSlowActive && currentTime > heroineSlowEndTime) {
+            heroineSlowActive = false;
+        }
+
+        // 4. Magnet Effect (pull sweets)
+        if (powerUpActive === 'magnet') {
+            const magnetRange = 80;
+            const magnetStrength = 0.5;
+            
+            sweets.forEach(sweet => {
+                const dx = player.x - sweet.x;
+                const dy = player.y - sweet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < magnetRange) {
+                    const angle = Math.atan2(dy, dx);
+                    // Pull based on distance from player
+                    const pullFactor = magnetStrength * (magnetRange - distance) / magnetRange;
+                    
+                    sweet.x += Math.cos(angle) * pullFactor * 5; // Fixed small pull
+                    sweet.y += Math.sin(angle) * pullFactor * 5;
+                }
+            });
+        }
     }
 
     function updateObjects(deltaTime) {
         const factor = deltaTime / 16; 
+        const currentTime = performance.now();
+        
+        // Apply heroine slow factor to poop speed if active
+        const currentPoopSpeed = heroineSlowActive ? poopDropSpeed * 0.3 : poopDropSpeed; 
 
+        // Sweets
         sweets = sweets.filter(sweet => {
             sweet.y += sweet.speed * factor;
             return sweet.y < CANVAS_HEIGHT + sweet.size;
         });
 
+        // Poops
         poops = poops.filter(poop => {
-            poop.y += poop.speed * factor;
+            // Bombs fall faster than normal poops
+            const speed = poop.emoji === '💣' ? currentPoopSpeed * 1.5 : currentPoopSpeed;
+            poop.y += speed * factor;
             return poop.y < CANVAS_HEIGHT + poop.size;
         });
         
-        hearts = hearts.filter(heart => {
-            heart.y += heart.speed * factor;
-            return heart.y < CANVAS_HEIGHT + heart.size;
+        // Power-ups
+        powerUps = powerUps.filter(powerUp => {
+            powerUp.y += powerUp.speed * factor;
+            return powerUp.y < CANVAS_HEIGHT + powerUp.size;
         });
+
+        // Mini-Bombs
+        miniBombs = miniBombs.filter(bomb => {
+            bomb.y += bomb.speed * factor;
+            if (bomb.y >= CANVAS_HEIGHT - 10) {
+                // Bomb hits the ground - EXPLODE!
+                noGoZones.push({
+                    x: bomb.x,
+                    y: CANVAS_HEIGHT - 10,
+                    radius: 40,
+                    endTime: currentTime + BOMB_EXPLOSION_DURATION
+                });
+                playHitSound(); 
+                return false; 
+            }
+            return true;
+        });
+
+        // No-Go Zones (Remove expired ones)
+        noGoZones = noGoZones.filter(zone => zone.endTime > currentTime);
     }
 
     function checkCollisions() {
         const pRect = { x: player.x - player.size / 2, y: player.y - player.size / 2, width: player.size, height: player.size };
+        const currentTime = performance.now();
 
         const isColliding = (r1, r2) => {
+            // Simplified AABB collision for square emojis
             return r1.x < r2.x + r2.width &&
                    r1.x + r1.width > r2.x &&
                    r1.y < r2.y + r2.height &&
                    r1.y + r2.height > r2.y;
         };
 
+        // 1. Sweet Collection
         sweets = sweets.filter(sweet => {
             const sRect = { x: sweet.x - sweet.size / 2, y: sweet.y - sweet.size / 2, width: sweet.size, height: sweet.size };
             if (isColliding(pRect, sRect)) {
@@ -697,47 +881,133 @@
             return true;
         });
 
+        // 2. Poop Collision (now includes shield and slow effect)
         poops = poops.filter(poop => {
             const rRect = { x: poop.x - poop.size / 2, y: poop.y - poop.size / 2, width: poop.size, height: poop.size };
             if (isColliding(pRect, rRect)) {
-                lives--;
-                updateHUD();
-                playHitSound();
-                if (lives <= 0) { endGame(); }
-                return false;
-            }
-            return true;
-        });
-        
-        hearts = hearts.filter(heart => {
-            const hRect = { x: heart.x - heart.size / 2, y: heart.y - heart.size / 2, width: heart.size, height: heart.size };
-            if (isColliding(pRect, hRect)) {
-                if (lives < MAX_LIVES) {
-                    lives++;
+                if (powerUpActive === 'shield') {
+                    powerUpActive = null; // Shield breaks
+                    return false;
+                }
+                
+                if (!player.invulnerable) {
+                    lives--;
                     updateHUD();
-                    playCollectHeartSound();
+                    playHitSound();
+                    
+                    // --- NEW STATUS EFFECT: PLAYER SLOW ---
+                    playerSlowed = true;
+                    slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
+                    
+                    player.invulnerable = true;
+                    setTimeout(() => player.invulnerable = false, 500); 
+
+                    if (lives <= 0) { endGame(); }
                 }
                 return false;
             }
             return true;
         });
+        
+        // 3. Power-Up Collection
+        powerUps = powerUps.filter(powerUp => {
+            const hRect = { x: powerUp.x - powerUp.size / 2, y: powerUp.y - powerUp.size / 2, width: powerUp.size, height: powerUp.size };
+            if (isColliding(pRect, hRect)) {
+                playCollectPowerUpSound();
+                applyPowerUp(powerUp.type);
+                return false;
+            }
+            return true;
+        });
+        
+        // 4. Mini-Bomb Collision (immediate explosion on contact)
+        miniBombs = miniBombs.filter(bomb => {
+            const bRect = { x: bomb.x - bomb.size / 2, y: bomb.y - bomb.size / 2, width: bomb.size, height: bomb.size };
+            if (isColliding(pRect, bRect)) {
+                if (powerUpActive !== 'shield' && !player.invulnerable) {
+                    lives--;
+                    updateHUD();
+                    playHitSound();
+                    playerSlowed = true;
+                    slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
+                    player.invulnerable = true;
+                    setTimeout(() => player.invulnerable = false, 500);
+                    if (lives <= 0) { endGame(); }
+                }
+                powerUpActive = null; // Shield or not, bomb is gone
+                return false; 
+            }
+            return true;
+        });
+        
+        // 5. No-Go Zone Collision (damage on entry)
+        const playerCenter = { x: player.x, y: player.y };
+        const playerHitZone = noGoZones.some(zone => {
+            const dx = playerCenter.x - zone.x;
+            const dy = playerCenter.y - zone.y;
+            return (dx * dx + dy * dy) < (zone.radius * zone.radius) && currentTime < zone.endTime;
+        });
+        
+        if (playerHitZone && !player.invulnerable) { 
+            lives--;
+            updateHUD();
+            playHitSound();
+            playerSlowed = true;
+            slowEndTime = currentTime + PLAYER_SLOW_DURATION; 
+            player.invulnerable = true;
+            setTimeout(() => player.invulnerable = false, 500);
+            if (lives <= 0) { endGame(); }
+        }
     }
 
     function draw() {
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        drawDevil();
+        const currentTime = performance.now();
+        
+        // --- 1. Draw No-Go Zones (Explosions) ---
+        noGoZones.forEach(zone => {
+            const radius = zone.radius * (zone.endTime > currentTime ? (zone.endTime - currentTime) / BOMB_EXPLOSION_DURATION : 0); 
+            
+            ctx.beginPath();
+            ctx.arc(zone.x, zone.y, radius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(zone.x, zone.y, 0, zone.x, zone.y, zone.radius);
+            gradient.addColorStop(0, 'rgba(255, 69, 0, 0.7)'); 
+            gradient.addColorStop(1, 'rgba(255, 69, 0, 0)'); 
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.closePath();
+        });
+
+        // --- 2. Draw Characters and Items ---
+        drawBossAndDevil(); 
         drawAngel(); 
         drawWitch(); 
         drawHeroine(); 
         
-        ctx.shadowColor = '#a855f7'; 
-        ctx.shadowBlur = 12;
-        drawEmoji(player.emoji, player.x, player.y, player.size);
-        ctx.shadowBlur = 0; 
-        
+        // Draw falling objects
         sweets.forEach(sweet => { drawEmoji(sweet.emoji, sweet.x, sweet.y, sweet.size); });
         poops.forEach(poop => { drawEmoji(poop.emoji, poop.x, poop.y, poop.size); });
-        hearts.forEach(heart => { drawEmoji(heart.emoji, heart.x, heart.y, heart.size); });
+        powerUps.forEach(pu => { drawEmoji(pu.emoji, pu.x, pu.y, pu.size); });
+        miniBombs.forEach(bomb => { drawEmoji(bomb.emoji, bomb.x, bomb.y, bomb.size); });
+
+        // --- 3. Draw Player and Effects ---
+        let playerEmoji = playerSlowed ? '🐢' : player.emoji; // Slowed status 
+        
+        if (powerUpActive === 'shield') {
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size * 1.2, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.8)'; 
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.closePath();
+        } 
+        
+        ctx.shadowColor = player.invulnerable ? '#ff0000' : (powerUpActive === 'speed' ? '#00ff00' : '#a855f7');
+        ctx.shadowBlur = player.invulnerable ? 15 : 12;
+        drawEmoji(playerEmoji, player.x, player.y, player.size);
+        ctx.shadowBlur = 0; 
     }
     
     function increaseDifficulty() {
@@ -745,15 +1015,15 @@
         const poopSpeedInterval = 10;
         
         if (score >= lastPoopSpeedIncreaseScore + poopSpeedInterval) {
+            // Base poop speed increase
             poopDropSpeed += poopSpeedIncrement;
             lastPoopSpeedIncreaseScore = Math.floor(score / poopSpeedInterval) * poopSpeedInterval;
         }
         
         if (score > 0 && score % 50 === 0 && score % 10 !== 0) {
             sweetDropSpeed += 0.1; 
-            player.speed += 0.05;
+            player.baseSpeed += 0.05;
             sweetSpawnRate = Math.max(650, sweetSpawnRate - 10);
-            poopSpawnRate = Math.max(450, poopSpawnRate - 10);
         }
     }
 
@@ -779,10 +1049,8 @@
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         
-        // Calculate the target X position in canvas coordinates
         let newX = (clientX - rect.left) * scaleX; 
         
-        // Clamp the target position to keep the player on screen
         playerMoveToX = Math.max(player.size / 2, Math.min(CANVAS_WIDTH - player.size / 2, newX));
     }
 
@@ -793,13 +1061,11 @@
     }
     
     function setupInputListeners() {
-        // Use generic 'pointer' events for unified mouse/touch input
         canvas.addEventListener('pointerdown', setPlayerTarget);
         canvas.addEventListener('pointermove', setPlayerTarget);
         canvas.addEventListener('pointerup', releasePointer);
         canvas.addEventListener('pointerleave', releasePointer); 
         
-        // Also add dedicated touch handlers for robustness on some devices
         canvas.addEventListener('touchstart', setPlayerTarget);
         canvas.addEventListener('touchmove', setPlayerTarget);
         canvas.addEventListener('touchend', releasePointer);
@@ -816,7 +1082,8 @@
         const factor = deltaTime / 16;
         const dx = playerMoveToX - player.x;
         const distance = Math.abs(dx);
-        const step = player.speed * factor;
+        // Use player.speed which is adjusted by effects
+        const step = player.speed * factor; 
 
         if (distance > step) {
             player.x += Math.sign(dx) * step;
@@ -829,6 +1096,32 @@
         scoreDisplay.textContent = score;
         livesDisplay.innerHTML = '❤️ '.repeat(Math.min(lives, MAX_LIVES));
         if (lives <= 0) { livesDisplay.innerHTML = '💔'; }
+        
+        const currentTime = performance.now();
+        
+        // Update player speed and emoji based on active effects
+        const currentBaseSpeed = playerSlowed ? player.baseSpeed * 0.5 : player.baseSpeed;
+        player.speed = (powerUpActive === 'speed' && !playerSlowed) ? player.baseSpeed * 2 : currentBaseSpeed;
+        
+        player.emoji = playerSlowed ? '🐢' : '😋';
+
+        // --- HUD Bar Cooldowns ---
+        
+        const remainingWitchTime = Math.max(0, nextWitchTime - currentTime);
+        const totalWitchTime = WITCH_MAX_INTERVAL + WITCH_MIN_INTERVAL / 2; // Average total
+        const witchPercent = Math.min(100, (remainingWitchTime / totalWitchTime) * 100);
+
+        const remainingHeroineTime = Math.max(0, nextHeroineTime - currentTime);
+        const totalHeroineTime = HEROINE_MAX_INTERVAL + HEROINE_MIN_INTERVAL / 2; // Average total
+        const heroinePercent = Math.min(100, (remainingHeroineTime / totalHeroineTime) * 100);
+        
+        // Witch Bar (Fills up when ready)
+        witchBar.style.width = `${100 - witchPercent}%`;
+        witchBar.style.backgroundColor = witchPercent > 0 ? '#ef4444' : '#10b981'; 
+        
+        // Heroine Bar (Fills up when ready)
+        heroineBar.style.width = `${100 - heroinePercent}%`;
+        heroineBar.style.backgroundColor = heroinePercent > 0 ? '#3b82f6' : '#10b981';
     }
 
     function showMessage(title, text, buttons) {
@@ -837,9 +1130,22 @@
         llmResponseContainer.classList.add('hidden');
         document.getElementById('llmResponseText').textContent = '';
         
-        const formattedText = text
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>'); 
+        const instructionTag = '$$INSTRUCTION$$';
+        let formattedText = text;
+
+        if (text.includes(instructionTag)) {
+            const parts = text.split(instructionTag);
+            
+            const instructionHtml = `<span class="intro-instruction">${parts[1]}</span>`;
+            
+            formattedText = parts[0].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') +
+                            instructionHtml +
+                            parts[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        } else {
+            formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
             
         document.getElementById('messageText').innerHTML = formattedText;
         
@@ -872,32 +1178,69 @@
         const deltaTime = currentTime - lastTime;
         lastTime = currentTime;
         
-        // Spawning
+        // --- BOSS/DEVIL LOGIC ---
+        const scoreMilestone = Math.floor(score / BOSS_INTERVAL_SCORE);
+        const shouldBeBoss = scoreMilestone > 0 && scoreMilestone % 2 !== 0; 
+        
+        if (shouldBeBoss && !nulliBossActive) {
+            // START BOSS PHASE
+            nulliBossActive = true;
+            bossEndTime = currentTime + BOSS_DURATION;
+            poopDropSpeed *= 1.5; // Boss speed boost
+            player.baseSpeed *= 0.7; // Player speed reduction during boss
+            player.speed *= 0.7;
+            console.log("BOSS START");
+        } 
+        
+        if (nulliBossActive && currentTime > bossEndTime) {
+            // END BOSS PHASE
+            nulliBossActive = false;
+            poopDropSpeed /= 1.5; 
+            player.baseSpeed /= 0.7;
+            player.speed /= 0.7;
+            console.log("BOSS END");
+        }
+        
+        // Spawning Logic
         if (currentTime - lastSweetTime > sweetSpawnRate) {
             spawnSweet();
             lastSweetTime = currentTime;
         }
-        if (currentTime - lastPoopTime > poopSpawnRate) {
-            spawnPoop();
-            lastPoopTime = currentTime;
+        
+        // Poop/Bomb Spawning
+        if (nulliBossActive) {
+             // Boss always drops fast '💣' poops
+             if (currentTime - lastPoopTime > 500) {
+                 spawnPoop('💣'); 
+                 lastPoopTime = currentTime;
+             }
+        } else {
+             // Devil (Normal Poop) spawning
+             if (currentTime - lastPoopTime > poopSpawnRate) {
+                spawnPoop(poopEmoji); 
+                lastPoopTime = currentTime;
+             }
+             // Mini-Bomb Spawning (NEW)
+             if (score >= MINI_BOMB_SCORE_START && currentTime - lastBombTime > BOMB_SPAWN_INTERVAL) {
+                 spawnMiniBomb();
+                 lastBombTime = currentTime;
+             }
         }
         
-        // Character Timers
-        if (hearts.length === 0 && currentTime - lastAngelTime > ANGEL_INTERVAL) {
-            spawnHeart(currentTime); 
-            lastAngelTime = currentTime;
+        // Character Cooldown Logic
+        if (powerUps.length === 0 && currentTime - lastAngelTime > ANGEL_INTERVAL) {
+            spawnPowerUp(currentTime); 
         }
         
-        // Character Hiding
         if (angelVisible && currentTime > angelHiddenTime) { angelVisible = false; }
         if (witchVisible && currentTime > witchHiddenTime) { witchVisible = false; }
         if (heroineVisible && currentTime > heroineHiddenTime) { heroineVisible = false; }
 
-        // Character Triggering
         if (!witchVisible && currentTime >= nextWitchTime) { triggerWitchEffect(currentTime); }
         if (!heroineVisible && currentTime >= nextHeroineTime) { triggerHeroineEffect(currentTime); }
 
         movePlayer(deltaTime);
+        updatePowerUpEffects(currentTime); // NEW: Manage timed effects
         updateObjects(deltaTime);
         checkCollisions();
         increaseDifficulty();
@@ -916,6 +1259,8 @@
         
         lastTime = performance.now();
         lastAngelTime = lastTime; 
+        lastWitchTime = lastTime;
+        lastHeroineTime = lastTime;
         nextWitchTime = calculateNextWitchTime(); 
         nextHeroineTime = calculateNextHeroineTime();
         
@@ -929,19 +1274,27 @@
         lives = 3;
         sweets = [];
         poops = [];
-        hearts = []; 
+        powerUps = []; 
+        miniBombs = [];
+        noGoZones = [];
+
+        // Reset all effects and timing
         lastAngelTime = performance.now(); 
         angelVisible = false;
         witchVisible = false;
-        nextWitchTime = calculateNextWitchTime();
         heroineVisible = false;
-        nextHeroineTime = calculateNextHeroineTime();
+        powerUpActive = null;
+        playerSlowed = false;
+        heroineSlowActive = false;
+        nulliBossActive = false;
+        lastBombTime = 0;
 
         // Reset difficulty
         sweetDropSpeed = 1.4;
         poopDropSpeed = 2.4;
         sweetSpawnRate = 1600;
         poopSpawnRate = 1100;
+        player.baseSpeed = 9;
         player.speed = 9;
         player.x = CANVAS_WIDTH / 2;
         playerMoveToX = CANVAS_WIDTH / 2;
@@ -961,7 +1314,7 @@
         if (button) button.disabled = true; 
         
         try {
-            await saveHighScore(name, finalScore); // Saves the score to the permanent leaderboard
+            await saveHighScore(name, finalScore);
         } catch(err) {
             console.error("Submission failed, proceeding with restart:", err);
         } finally {
@@ -987,9 +1340,9 @@ Enter your name to record your high score on the permanent, competitive leaderbo
 
         const buttons = [
             { 
-                id: 'geminiButton', 
-                text: '✨ Get Final Word', 
-                action: () => generateThematicDialogue(finalScore), 
+                id: 'finalWordButton', 
+                text: '✨ View Final Word', 
+                action: () => showFinalWord(finalScore), 
                 className: 'button-llm' 
             },
             { 
@@ -1005,11 +1358,15 @@ Enter your name to record your high score on the permanent, competitive leaderbo
     }
     
     function showIntroMessage() {
-        const introText = `Welcome to **😈 Poopocalypse: Nulli Rising 🧙**! You control 😋 to collect treats (🍬, 🍭) and score points! Avoid the repulsive 💩 from evil **Jehannum** (😈). As you collect more sweets, the poops will fall faster!
+        const instructionTag = '$$INSTRUCTION$$';
+        
+        const introText = `Welcome to **😈 Poopocalypse: Nulli Rising 🧙**! You control 😋 to collect treats (🍬, 🍭) and score points! Avoid the repulsive 💩 from evil **Jehannum** (😈) and his explosive **Mini-Bombs** (💥). Every **500 points**, face the terrifying **Nulli Boss** (👹)!
 
-Look for the 😇 angel **Mandala** (drops 💖 for +1 life) and the 🧝‍♀️ heroine **Zey** (destroys all 💩!). Be wary of the 🧙‍♀️ witch **Jackyna** (clears all treats!).
+Look for the 😇 angel **Mandala** (drops **Power-Ups** - 🛡️, 🧲, ⚡), the 🧝‍♀️ heroine **Zey** (clears all 💩!), and the 🧙‍♀️ witch **Jackyna** (clears all treats!).
 
-Use your finger to move 😋 and survive the onslaught! Get the highest score on the permanent leaderboard below!`;
+Watch the **HUD bars** for when the Witch and Heroine are ready!
+
+${instructionTag}Move 😋 with your finger to avoid disaster!${instructionTag}`;
 
         const buttons = [
             { id: 'startButton', text: "Let's Go!", action: startGame, className: 'button-submit' }
@@ -1047,10 +1404,10 @@ Use your finger to move 😋 and survive the onslaught! Get the highest score on
         await setupFirebase();
         
         if (db) {
-            loadHighScores(); // Sets up the real-time listener for the permanent leaderboard
+            loadHighScores(); 
         }
         
-        resetGame(); // Initial clean slate
+        resetGame();
     }
 
     window.onload = init;
