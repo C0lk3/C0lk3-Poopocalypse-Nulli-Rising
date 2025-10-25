@@ -109,6 +109,35 @@
             box-shadow: 0 2px #006400;
         }
 
+        /* Control Selector Styles */
+        .control-selector {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: #4a148c; /* Deep Violet */
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .control-selector label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.1s;
+        }
+        .control-selector input[type="radio"]:checked + label {
+            background-color: #00f800;
+            color: black;
+            box-shadow: 0 0 10px #00f800;
+        }
+        .control-selector input[type="radio"] {
+            display: none;
+        }
+
+
         /* --- Game Container Styles (starts hidden) --- */
         #gameContainer {
             display: none; /* Initially hidden */
@@ -172,6 +201,40 @@
             height: auto; /* Maintain aspect ratio */
             aspect-ratio: 1 / 1; /* Force square aspect ratio */
         }
+
+        /* --- NEW CONTROL BUTTON STYLES --- */
+        #controls {
+            /* This is dynamically hidden/shown by JS based on controlMode */
+            display: none; 
+            justify-content: center; /* Center the buttons horizontally */
+            width: 100%;
+            padding: 15px 0;
+            margin-top: 5px; /* Gap between canvas and buttons */
+        }
+
+        #controls button {
+            padding: 10px 20px; 
+            font-size: 0.8rem; 
+            font-weight: 700;
+            color: black;
+            background: linear-gradient(145deg, #fceb9c, #ffcc00);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 3px #cc9900;
+            user-select: none;
+            text-transform: uppercase;
+            font-family: 'Press Start 2P', cursive;
+            margin: 0 10px; /* Space between buttons */
+            min-width: 120px;
+        }
+
+        #controls button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px #cc9900;
+        }
+        /* --- END NEW CONTROL BUTTON STYLES --- */
 
         .button {
             padding: 0.5rem 1rem;
@@ -318,8 +381,23 @@
             <li><b>Jehannum (😈):</b> The Source of the filth! Throws Poop and Bombs.</li>
         </ul>
         <br><br> 
-        Master the swipe! Move your collector (😋) with precision to survive the onslaught and climb the Global Leaderboard!
     </p>
+
+    <!-- NEW CONTROL SELECTION UI -->
+    <div class="control-selector">
+        <span class="fa-title" style="margin-top: 0; color: #ffcc00;">SELECT CONTROL MODE</span>
+
+        <input type="radio" id="control-buttons" name="control-mode" value="buttons" checked>
+        <label for="control-buttons">
+            ➡️ BUTTONS: Use the Left/Right buttons below the canvas.
+        </label>
+
+        <input type="radio" id="control-touch" name="control-mode" value="touch">
+        <label for="control-touch">
+            👆 TOUCH/DRAG: Drag your finger/mouse across the screen to move.
+        </label>
+    </div>
+    <!-- END NEW CONTROL SELECTION UI -->
 
     <button id="launchButton" class="launch-button">
         Launch Game Now!
@@ -328,7 +406,6 @@
 
 
 <div id="gameContainer" class="game-container">
-    <!-- FIX APPLIED HERE: The .game-title class now has 'text-align: center;' in the <style> block -->
     <h1 class="game-title">😈 POOPOCALYPSE: NULLI RISING 🧙</h1>
 
     <!-- Consolidated Top HUD: Score, Lives, and Cooldowns -->
@@ -344,22 +421,18 @@
         <div id="hudPanel" class="w-full flex justify-around text-xs font-bold">
             <!-- Mandala Bar (Angel Power-up Cooldown) - FIRST (Mandala) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <!-- ADDED ID for dynamic countdown text -->
                 <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="mandalaLabel">😇 MANDALA</div>
-                <!-- Removed inline style width=100% -->
                 <div id="mandalaBar" class="h-4 bg-purple-500 transition-all duration-100"></div>
             </div>
 
             <!-- Zey Bar (Poop Clear Cooldown) - SECOND (Zey) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <!-- ADDED ID for dynamic countdown text -->
                 <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="zeyLabel">🧝‍♀️ ZEY</div>
                 <div id="zeyBar" class="h-4 bg-blue-500 transition-all duration-100"></div>
             </div>
 
             <!-- Jackyna Bar (Sweet Clear Cooldown) - THIRD (Jackyna) -->
             <div class="flex-1 bg-gray-700 rounded-full overflow-hidden relative h-4">
-                <!-- ADDED ID for dynamic countdown text -->
                 <div class="absolute inset-0 text-center text-white z-10 text-[8px] sm:text-[10px]" id="jackynaLabel">🧙‍♀️ JACKYNA</div>
                 <div id="jackynaBar" class="h-4 bg-red-500 transition-all duration-100"></div>
             </div>
@@ -369,6 +442,16 @@
     <!-- Canvas is set to default 400x400, but CSS makes it responsive -->
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     
+    <!-- NEW CONTROL BUTTONS SECTION - HIDDEN BY DEFAULT, SHOWN FOR BUTTON MODE -->
+    <div id="controls">
+        <button id="move-left" aria-label="Move Left">
+            ⬅️ Left
+        </button>
+        <button id="move-right" aria-label="Move Right">
+            Right ➡️
+        </button>
+    </div>
+    <!-- END NEW CONTROL BUTTONS SECTION -->
 </div>
 
 
@@ -437,7 +520,6 @@
             "Did you mistake this for a 'poop collector' game? Your score suggests confusion. You are a true embarrassment!",
             "This isn't even worth a taunt. Your score is a joke. Go practice in the nursery, little one.",
             "Your sweet-gathering skills are a blight on the earth. Perhaps you should stick to something simpler, like breathing.",
-            // MODIFIED LINE: removed asterisks from 'this'
             "I was hoping for a challenge, and you delivered this? Your score is a stain on the leaderboard.",
             "Look at that low number! Did you rage quit or did the Nulli's gifts simply overwhelm your tiny mind?",
             "You are a disappointment to both clans. That score is a monument to your lack of effort. Don't bother returning."
@@ -448,6 +530,7 @@
     const launcherContainer = document.getElementById('launcherContainer');
     const gameContainer = document.getElementById('gameContainer');
     const launchButton = document.getElementById('launchButton');
+    const controlsContainer = document.getElementById('controls'); // New ref
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('scoreDisplay');
@@ -491,9 +574,15 @@
     let score = 0;
     let lives = 3;
     let gameRunning = false;
-    let playerMoveToX = canvas.width / 2; // Initialize to current center
-    let isPointerDown = false;
     let lastTime = 0;
+    
+    // Movement state variables
+    let moveLeft = false;
+    let moveRight = false;
+    let isPointerDown = false; // New state for touch/drag mode
+    
+    // NEW: Control Mode State
+    let controlMode = 'buttons'; // Default mode
 
     let angelVisible = false;
     let angelHiddenTime = 0;
@@ -518,8 +607,8 @@
         y: INITIAL_CANVAS_HEIGHT - 30, // Y position is fixed relative to bottom
         size: 30,
         emoji: '😋',
-        baseSpeed: 9,
-        speed: 9,
+        baseSpeed: 5, 
+        speed: 5,     
         invulnerable: false 
     };
 
@@ -807,7 +896,6 @@
         player.y = canvas.height - 30;
         // Keep player's X position clamped to the new width
         player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
-        playerMoveToX = player.x;
 
         draw();
     }
@@ -1239,72 +1327,181 @@
         }
     }
 
-    function getPointerX(event) {
-        if (event.touches && event.touches.length > 0) {
-            return event.touches[0].clientX;
-        }
-        if (event.clientX !== undefined) {
-            return event.clientX;
-        }
-        return null;
-    }
-
-    function setPlayerTarget(event) {
-        event.preventDefault();
+    // --- BUTTON Movement Control Functions (USED FOR controlMode == 'buttons') ---
+    function startMove(direction) {
         if (!gameRunning) return;
-
-        isPointerDown = true;
-
-        const clientX = getPointerX(event);
-        if (clientX === null) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-
-        let newX = (clientX - rect.left) * scaleX;
-
-        // Player target is clamped based on dynamic canvas width
-        playerMoveToX = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, newX));
+        if (direction === 'left') {
+            moveLeft = true;
+            moveRight = false;
+        } else if (direction === 'right') {
+            moveRight = true;
+            moveLeft = false;
+        }
     }
 
-    function releasePointer(event) {
-        if (event.type === 'pointerup' || event.type === 'pointerleave' || event.type === 'touchend' || event.type === 'touchcancel') {
-            isPointerDown = false;
-        }
+    function stopMove() {
+        moveLeft = false;
+        moveRight = false;
+    }
+    
+    // --- TOUCH/DRAG Movement Control Functions (USED FOR controlMode == 'touch') ---
+    function handlePointerDown(e) {
+        if (!gameRunning || controlMode !== 'touch') return;
+        isPointerDown = true;
+        handlePointerMove(e); // Set initial position
+    }
+
+    function handlePointerMove(e) {
+        if (!gameRunning || !isPointerDown || controlMode !== 'touch') return;
+        
+        // Prevent scrolling on touch devices during move
+        e.preventDefault(); 
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        
+        // Convert clientX (screen position) to canvas X coordinate
+        const rect = canvas.getBoundingClientRect();
+        let newX = (clientX - rect.left) / rect.width * canvas.width; 
+        
+        // Clamp the player position within the canvas boundaries
+        newX = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, newX));
+        player.x = newX;
+    }
+
+    function handlePointerUp() {
+        isPointerDown = false;
+    }
+
+
+    function setupButtonListeners() {
+        // Remove touch listeners (if any were attached previously)
+        canvas.removeEventListener('pointerdown', handlePointerDown);
+        canvas.removeEventListener('pointermove', handlePointerMove);
+        canvas.removeEventListener('pointerup', handlePointerUp);
+        canvas.removeEventListener('pointerleave', handlePointerUp);
+        canvas.removeEventListener('touchmove', handlePointerMove);
+        canvas.removeEventListener('touchend', handlePointerUp);
+        canvas.removeEventListener('touchcancel', handlePointerUp);
+        canvas.removeEventListener('touchstart', handlePointerDown);
+
+        controlsContainer.style.display = 'flex';
+        
+        const moveLeftButton = document.getElementById('move-left');
+        const moveRightButton = document.getElementById('move-right');
+        
+        // Ensure all previous button listeners are removed before re-attaching (cleaner for a real app, though not strictly necessary here since we only call it once in init)
+        moveLeftButton.removeEventListener('mousedown', startMove);
+        moveLeftButton.removeEventListener('touchstart', startMove);
+        moveLeftButton.removeEventListener('mouseup', stopMove);
+        moveLeftButton.removeEventListener('mouseleave', stopMove);
+        moveLeftButton.removeEventListener('touchend', stopMove);
+        moveLeftButton.removeEventListener('touchcancel', stopMove);
+        moveRightButton.removeEventListener('mousedown', startMove);
+        moveRightButton.removeEventListener('touchstart', startMove);
+        moveRightButton.removeEventListener('mouseup', stopMove);
+        moveRightButton.removeEventListener('mouseleave', stopMove);
+        moveRightButton.removeEventListener('touchend', stopMove);
+        moveRightButton.removeEventListener('touchcancel', stopMove);
+        
+
+        // Left Button - Attach new listeners
+        moveLeftButton.addEventListener('mousedown', () => startMove('left'));
+        moveLeftButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMove('left'); });
+        moveLeftButton.addEventListener('mouseup', stopMove);
+        moveLeftButton.addEventListener('mouseleave', stopMove);
+        moveLeftButton.addEventListener('touchend', stopMove);
+        moveLeftButton.addEventListener('touchcancel', stopMove);
+        
+        // Right Button - Attach new listeners
+        moveRightButton.addEventListener('mousedown', () => startMove('right'));
+        moveRightButton.addEventListener('touchstart', (e) => { e.preventDefault(); startMove('right'); });
+        moveRightButton.addEventListener('mouseup', stopMove);
+        moveRightButton.addEventListener('mouseleave', stopMove);
+        moveRightButton.addEventListener('touchend', stopMove);
+        moveRightButton.addEventListener('touchcancel', stopMove);
+        
+        // Set initial movement state to stopped
+        stopMove();
+    }
+    
+    function setupTouchListeners() {
+        // Remove button listeners (if any were attached previously)
+        controlsContainer.style.display = 'none';
+
+        const moveLeftButton = document.getElementById('move-left');
+        const moveRightButton = document.getElementById('move-right');
+        
+        moveLeftButton.removeEventListener('mousedown', startMove);
+        moveLeftButton.removeEventListener('touchstart', startMove);
+        moveLeftButton.removeEventListener('mouseup', stopMove);
+        moveLeftButton.removeEventListener('mouseleave', stopMove);
+        moveLeftButton.removeEventListener('touchend', stopMove);
+        moveLeftButton.removeEventListener('touchcancel', stopMove);
+        moveRightButton.removeEventListener('mousedown', startMove);
+        moveRightButton.removeEventListener('touchstart', startMove);
+        moveRightButton.removeEventListener('mouseup', stopMove);
+        moveRightButton.removeEventListener('mouseleave', stopMove);
+        moveRightButton.removeEventListener('touchend', stopMove);
+        moveRightButton.removeEventListener('touchcancel', stopMove);
+
+        // Attach touch/pointer listeners to the canvas
+        canvas.addEventListener('pointerdown', handlePointerDown);
+        canvas.addEventListener('pointermove', handlePointerMove);
+        canvas.addEventListener('pointerup', handlePointerUp);
+        canvas.addEventListener('pointerleave', handlePointerUp);
+        // Fallback for older touch events
+        canvas.addEventListener('touchstart', handlePointerDown);
+        canvas.addEventListener('touchmove', handlePointerMove);
+        canvas.addEventListener('touchend', handlePointerUp);
+        canvas.addEventListener('touchcancel', handlePointerUp);
+        
+        // Set initial movement state to stopped
+        isPointerDown = false;
     }
 
     function setupInputListeners() {
-        // Use pointer events for unified touch/mouse input
-        canvas.addEventListener('pointerdown', setPlayerTarget);
-        canvas.addEventListener('pointermove', setPlayerTarget);
-        canvas.addEventListener('pointerup', releasePointer);
-        canvas.addEventListener('pointerleave', releasePointer);
-
-        // Resize listeners for responsiveness
         window.addEventListener('resize', resizeGame);
         
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        // Attach the appropriate listeners based on the current mode
+        if (controlMode === 'buttons') {
+            setupButtonListeners();
+        } else {
+            setupTouchListeners();
+        }
+    }
+    
+    // Function to handle control mode change
+    function setControlMode(mode) {
+        controlMode = mode;
+        // Re-setup listeners to detach the old ones and attach the new ones
+        setupInputListeners(); 
     }
 
     function movePlayer(deltaTime) {
-        if (!isPointerDown) {
+        // Movement is only handled if in 'buttons' mode
+        if (controlMode !== 'buttons') {
+            // Touch mode handles movement directly in handlePointerMove, 
+            // so we do nothing here for touch mode.
             return;
         }
-
+        
         const factor = deltaTime / 16;
-        const dx = playerMoveToX - player.x;
-        const distance = Math.abs(dx);
         // Use player.speed which is adjusted by effects and slow status
         const step = player.speed * factor;
+        let newX = player.x;
 
-        if (distance > step) {
-            player.x += Math.sign(dx) * step;
+        if (moveLeft) {
+            newX -= step;
+        } else if (moveRight) {
+            newX += step;
         } else {
-            player.x = playerMoveToX;
+            return; // No movement needed if no button is pressed
         }
 
         // CRITICAL FIX: Final clamping to prevent passing the walls
-        player.x = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, player.x));
+        newX = Math.max(player.size / 2, Math.min(canvas.width - player.size / 2, newX));
+        
+        player.x = newX;
     }
 
     function updateHUD() {
@@ -1498,8 +1695,6 @@
         playStartSound();
         gameRunning = true;
 
-        // Note: Timers are now initialized in resetGame()
-
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
@@ -1526,6 +1721,11 @@
         nulliBossActive = false;
         lastBombTime = 0;
         
+        // Reset movement states
+        moveLeft = false;
+        moveRight = false;
+        isPointerDown = false;
+
         // Initialize next spawn times so HUD bars are correct (start at 0%)
         nextJackynaTime = calculateNextJackynaTime();
         nextZeyTime = calculateNextZeyTime();
@@ -1535,13 +1735,11 @@
         poopDropSpeed = 2.4;
         sweetSpawnRate = 1600;
         poopSpawnRate = 1100;
-        player.baseSpeed = 9;
-        player.speed = 9;
+        player.baseSpeed = 5; 
+        player.speed = 5;     
         
         // Reset player position using the dynamically resized canvas width
         player.x = canvas.width / 2;
-        playerMoveToX = canvas.width / 2;
-        isPointerDown = false;
         lastPoopSpeedIncreaseScore = 0;
 
         updateHUD();
@@ -1612,7 +1810,28 @@ Enter your name to record your high score on the permanent, competitive leaderbo
         launcherContainer.style.display = 'none';
         gameContainer.style.display = 'flex';
         resizeGame(); // Perform initial resize to set up canvas dimensions
+        
+        // Ensure controls are visible/hidden based on the chosen mode
+        if (controlMode === 'buttons') {
+            controlsContainer.style.display = 'flex';
+        } else {
+            controlsContainer.style.display = 'none';
+        }
+        
         startGame(); // Start the game immediately
+    }
+    
+    // Function to initialize the control mode from the radio buttons
+    function initializeControlMode() {
+        const selectedMode = document.querySelector('input[name="control-mode"]:checked')?.value || 'buttons';
+        controlMode = selectedMode;
+        
+        // Attach change listeners to update mode dynamically
+        document.querySelectorAll('input[name="control-mode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                setControlMode(e.target.value);
+            });
+        });
     }
 
     function setupLauncher() {
@@ -1620,6 +1839,9 @@ Enter your name to record your high score on the permanent, competitive leaderbo
             playLaunchSound();
             setTimeout(showGame, 100);
         });
+        
+        // Initialize the control mode when the launcher loads
+        initializeControlMode();
     }
 
     async function init() {
@@ -1627,7 +1849,8 @@ Enter your name to record your high score on the permanent, competitive leaderbo
         resizeGame(); 
 
         setupLauncher();
-        setupInputListeners();
+        // Setup initial listeners based on the mode selected on the launcher screen
+        setupInputListeners(); 
 
         await setupFirebase();
 
