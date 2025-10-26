@@ -32,7 +32,55 @@
             transition: background-color 0.5s;
         }
 
+        /* --- Loading Screen Styles (NEW) --- */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg);
+            z-index: 200; /* Above everything */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--neon-green);
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            transition: opacity 0.5s ease-out;
+            opacity: 1; /* Start opaque */
+        }
+        .loading-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--gold-title);
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+        }
+        #loadingText {
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            color: #ffffff;
+        }
+        #loadingBarContainer {
+            width: 80%;
+            max-width: 300px;
+            height: 16px;
+            border: 2px solid var(--neon-green);
+            border-radius: 8px;
+            margin-top: 1rem;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        #loadingBar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--neon-green);
+            transition: width 0.1s linear;
+        }
+
         /* --- Launcher Card Styles --- */
+        /* Make sure it's hidden initially */
         #launcherContainer {
             background-color: var(--card-bg);
             border: 4px solid var(--neon-green);
@@ -346,8 +394,20 @@
 </head>
 <body>
 
+<!-- NEW: Loading Screen - Displays the game title and a progress bar -->
+<div id="loadingScreen">
+    <div class="loading-title">
+        <span class="text-3xl animate-pulse">😈</span> POOPOCALYPSE: NULLI RISING <span class="text-3xl animate-pulse">🧙</span>
+    </div>
+    <div id="loadingText" class="text-base">INITIALIZING ASSETS... 0%</div>
+    <div id="loadingBarContainer">
+        <div id="loadingBar"></div>
+    </div>
+</div>
+<!-- END NEW: Loading Screen -->
 
-<div id="launcherContainer" class="flex flex-col">
+
+<div id="launcherContainer" class="flex flex-col hidden">
     <div class="main-title">😈 POOPOCALYPSE: NULLI RISING 🧙</div>
 
     <p class="description">
@@ -527,6 +587,10 @@
     };
 
     // --- DOM Elements & Constants ---
+    const loadingScreen = document.getElementById('loadingScreen');
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingText = document.getElementById('loadingText');
+
     const launcherContainer = document.getElementById('launcherContainer');
     const gameContainer = document.getElementById('gameContainer');
     const launchButton = document.getElementById('launchButton');
@@ -1806,6 +1870,17 @@ Enter your name to record your high score on the permanent, competitive leaderbo
 
     // --- Initialization & Launcher ---
 
+    function showLauncher() {
+        // Hide the loading screen with a fade effect
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            // Show the launcher
+            launcherContainer.classList.remove('hidden');
+            launcherContainer.style.display = 'flex';
+        }, 500); // Wait for the fade transition (0.5s)
+    }
+
     function showGame() {
         launcherContainer.style.display = 'none';
         gameContainer.style.display = 'flex';
@@ -1843,8 +1918,43 @@ Enter your name to record your high score on the permanent, competitive leaderbo
         // Initialize the control mode when the launcher loads
         initializeControlMode();
     }
+    
+    // NEW: Loading Sequence
+    function startLoadingSequence() {
+        const duration = 2000; // 2 seconds
+        const startTime = performance.now();
+        let currentProgress = 0;
+
+        const updateLoading = () => {
+            const elapsedTime = performance.now() - startTime;
+            let progress = Math.min(100, Math.ceil((elapsedTime / duration) * 100));
+            
+            if (progress > currentProgress) {
+                currentProgress = progress;
+                loadingBar.style.width = `${progress}%`;
+                loadingText.textContent = `LOADING... ${progress}%`;
+            }
+
+            if (progress < 100) {
+                requestAnimationFrame(updateLoading);
+            } else {
+                // Done loading, proceed to launcher
+                loadingText.textContent = `LOADING COMPLETE! 100%`;
+                setTimeout(showLauncher, 300); // Short delay before fading out
+            }
+        };
+
+        updateLoading();
+    }
 
     async function init() {
+        // Start the loading sequence immediately
+        startLoadingSequence();
+
+        // Perform asynchronous setup while the loading bar runs
+        // We don't need to await this to block the loading bar, but we ensure it's done before the game starts
+        const firebasePromise = setupFirebase();
+
         // Initial setup for the canvas to ensure it fits the responsive styles
         resizeGame(); 
 
@@ -1852,7 +1962,7 @@ Enter your name to record your high score on the permanent, competitive leaderbo
         // Setup initial listeners based on the mode selected on the launcher screen
         setupInputListeners(); 
 
-        await setupFirebase();
+        await firebasePromise; // Wait for Firebase setup to finish
 
         if (db) {
             loadHighScores();
